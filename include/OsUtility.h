@@ -461,7 +461,7 @@ bool os_event_flags_get_ex(OS_EventGroup& eventFlags, OS_Ulong flagsToGet,
 
 #ifdef __cplusplus
 /* Host SIL / HF_RTOS_NONE: identity conversion so headers that call
- * os_convert_msec_to_delay_ticks (RtosMutex, Max22200, ValvesManager) compile
+ * os_convert_msec_to_delay_ticks (RtosMutex and other headers) compile
  * without pulling an RTOS. 1 ms == 1 tick. */
 static constexpr uint32_t osTickRateHz = 1000;
 
