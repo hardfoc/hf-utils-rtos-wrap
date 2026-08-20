@@ -75,7 +75,7 @@ public:
 
   ~RtosMutex() noexcept {
 #if !defined(HF_RTOS_NONE) && !defined(HF_MCU_FAMILY_NONE)
-    if (handle_) {
+    if (os_mutex_is_live(&handle_)) {
       os_recursive_mutex_delete(&handle_);
     }
 #endif
@@ -91,7 +91,7 @@ public:
   RtosMutex& operator=(RtosMutex&& other) noexcept {
     if (this != &other) {
 #if !defined(HF_RTOS_NONE) && !defined(HF_MCU_FAMILY_NONE)
-      if (handle_) {
+      if (os_mutex_is_live(&handle_)) {
         os_recursive_mutex_delete(&handle_);
       }
 #endif
@@ -190,10 +190,10 @@ public:
 
   ~RtosSharedMutex() noexcept {
 #if !defined(HF_RTOS_NONE) && !defined(HF_MCU_FAMILY_NONE)
-    if (writer_mutex_) {
+    if (os_mutex_is_live(&writer_mutex_)) {
       os_mutex_delete(&writer_mutex_);
     }
-    if (reader_mutex_) {
+    if (os_mutex_is_live(&reader_mutex_)) {
       os_mutex_delete(&reader_mutex_);
     }
 #endif
@@ -214,8 +214,8 @@ public:
   RtosSharedMutex& operator=(RtosSharedMutex&& other) noexcept {
     if (this != &other) {
 #if !defined(HF_RTOS_NONE) && !defined(HF_MCU_FAMILY_NONE)
-      if (writer_mutex_) { os_mutex_delete(&writer_mutex_); }
-      if (reader_mutex_) { os_mutex_delete(&reader_mutex_); }
+      if (os_mutex_is_live(&writer_mutex_)) { os_mutex_delete(&writer_mutex_); }
+      if (os_mutex_is_live(&reader_mutex_)) { os_mutex_delete(&reader_mutex_); }
 #endif
       writer_mutex_ = other.writer_mutex_;
       reader_mutex_ = other.reader_mutex_;

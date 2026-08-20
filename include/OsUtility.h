@@ -39,37 +39,8 @@ enum time_unit_t {
 
 #define UTIL_SYSTEM_CLOCK (240000000.0)	//240MHz
 
-#if defined(HF_RTOS_FREERTOS)
-static constexpr uint32_t osTickRateHz = configTICK_RATE_HZ; // 1000 ticks per second
-#else
-static constexpr uint32_t osTickRateHz = 1000; // Default 1 kHz assumed
-#endif
-
-#if defined(HF_RTOS_FREERTOS)
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-/**
- * @brief Delays execution for the specified number of milliseconds.
- *
- * @param msec The delay duration in milliseconds.
- */
-void os_delay_msec(uint16_t msec);
-
-/**
- * @brief Retrieves the elapsed time in milliseconds.
- *
- * @return The elapsed time in milliseconds.
- */
-uint32_t os_get_elapsed_time_msec();
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif /* HF_RTOS_FREERTOS */
+#if defined(HF_RTOS_FREERTOS) || defined(HF_RTOS_THREADX)
+static constexpr uint32_t osTickRateHz = 1000;
 
 // ── Portable constexpr conversion utilities (work regardless of RTOS) ────
 /**
@@ -96,8 +67,7 @@ constexpr uint32_t os_convert_hz_to_delay_ticks( uint32_t frequency )
 	return osTickRateHz/frequency;
 }
 
-// ── FreeRTOS-specific declarations (implemented in OsUtility.cpp) ────────
-#if defined(HF_RTOS_FREERTOS)
+// ── RTOS declarations (implemented in OsUtility.cpp) ─────────────────────
 
 #ifdef __cplusplus
 extern "C" {
@@ -482,12 +452,34 @@ bool os_event_flags_get_ex(OS_EventGroup& eventFlags, OS_Ulong flagsToGet,
 }
 #endif
 
-#endif /* HF_RTOS_FREERTOS — end of FreeRTOS-specific declarations */
+#endif /* HF_RTOS_FREERTOS || HF_RTOS_THREADX */
 
 /* ═══════════════════════════════════════════════════════════════════════════
  * RTOS_NONE  — inline no-op stubs for _ex functions (OsUtility.cpp not compiled)
  * ═══════════════════════════════════════════════════════════════════════════ */
 #if defined(HF_RTOS_NONE) || defined(HF_MCU_FAMILY_NONE)
+
+#ifdef __cplusplus
+/* Host SIL / HF_RTOS_NONE: identity conversion so headers that call
+ * os_convert_msec_to_delay_ticks (RtosMutex, Max22200, ValvesManager) compile
+ * without pulling an RTOS. 1 ms == 1 tick. */
+static constexpr uint32_t osTickRateHz = 1000;
+
+constexpr uint32_t os_convert_msec_to_delay_ticks(uint32_t milliseconds)
+{
+  return milliseconds * osTickRateHz / 1000U;
+}
+
+constexpr uint32_t os_convert_delay_ticks_to_msec(uint32_t delayTicks)
+{
+  return (delayTicks * 1000U) / osTickRateHz;
+}
+
+constexpr uint32_t os_convert_hz_to_delay_ticks(uint32_t frequency)
+{
+  return (frequency == 0U) ? 0U : (osTickRateHz / frequency);
+}
+#endif
 
 #ifdef __cplusplus
 extern "C" {

@@ -162,7 +162,7 @@ bool BaseThread::IsSuspended() noexcept
             if( OS_SUCCESS == os_thread_info_get(&osThread, &state) )
 	    {
 	    	// Check if the thread is suspended
-                return (state == eSuspended) || (state == eBlocked);
+                return os_thread_state_is_suspended(state);
 	    }
 
 	    return false;
@@ -300,14 +300,47 @@ bool BaseThread::StopThreadAndWaitToVerify(uint32_t stopTimeoutMsec) {
 
 uint32_t BaseThread::GetStackHighWaterMark() const noexcept
 {
+#if defined(HF_RTOS_FREERTOS)
     return uxTaskGetStackHighWaterMark(osThread);
+#elif defined(HF_RTOS_THREADX)
+    if (!os_thread_is_live(&osThread)) {
+        return 0;
+    }
+    /* Unused bytes from the watermark pointer to stack end (when stack check is on). */
+    if (osThread.tx_thread_stack_highest_ptr == TX_NULL ||
+        osThread.tx_thread_stack_end == TX_NULL) {
+        return 0;
+    }
+    const auto* highest = static_cast<const uint8_t*>(osThread.tx_thread_stack_highest_ptr);
+    const auto* end = static_cast<const uint8_t*>(osThread.tx_thread_stack_end);
+    if (end <= highest) {
+        return 0;
+    }
+    return static_cast<uint32_t>(end - highest) / sizeof(uint32_t);
+#else
+    return 0;
+#endif
 }
 
 bool BaseThread::ChangePriority(uint32_t newPriority) noexcept
 {
+#if defined(HF_RTOS_FREERTOS)
     if (osThread) {
         vTaskPrioritySet(osThread, newPriority);
         return true;
     }
     return false;
+#elif defined(HF_RTOS_THREADX)
+    if (!os_thread_is_live(&osThread)) {
+        return false;
+    }
+    UINT old_priority = 0;
+    const UINT err = tx_thread_priority_change(&osThread, static_cast<UINT>(newPriority),
+                                               &old_priority);
+    (void)old_priority;
+    return err == TX_SUCCESS;
+#else
+    (void)newPriority;
+    return false;
+#endif
 }

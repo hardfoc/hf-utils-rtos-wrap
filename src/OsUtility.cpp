@@ -9,15 +9,16 @@
   */
 #include <cmath>
 #include "OsAbstraction.h"
-#include "FreeRTOSUtils.h"
 #include "OsUtility.h"
+#if defined(HF_RTOS_FREERTOS)
+#include "FreeRTOSUtils.h"
+#endif
 
 //==============================================================//
 // GLOBALS
 //==============================================================//
+// os_critical_mux is defined in CriticalSection.cpp
 
-// Critical section mutex required by OsAbstraction.h
-OS_Critical os_critical_mux = portMUX_INITIALIZER_UNLOCKED;
 
 //==============================================================//
 // FUNCTIONS
@@ -95,9 +96,7 @@ uint32_t os_get_elapsed_processor_cycle_count(uint32_t startCycleCount, time_uni
 		}
     }
 
-    // ESP32 doesn't have DWT registers, use FreeRTOS tick count instead
-    // Note: This provides lower resolution than ARM DWT but is portable
-    uint32_t current_ticks = xTaskGetTickCount();
+    uint32_t current_ticks = static_cast<uint32_t>(os_time_get());
     uint32_t elapsed_ticks;
     
     if(startCycleCount > current_ticks)
@@ -111,13 +110,11 @@ uint32_t os_get_elapsed_processor_cycle_count(uint32_t startCycleCount, time_uni
 
     // Convert ticks to the requested time unit
     // Note: This is an approximation since we're using ticks instead of actual cycles
-    return (uint32_t)(elapsed_ticks * (1000.0 / configTICK_RATE_HZ) / (1000.0 / divider));
+    return (uint32_t)(elapsed_ticks * (1000.0 / osTickRateHz) / (1000.0 / divider));
 }
 
 uint32_t os_get_processor_cycle_count(){
-    // Return FreeRTOS tick count instead of actual processor cycles
-    // This provides consistent timing across different platforms
-    return xTaskGetTickCount();
+    return static_cast<uint32_t>(os_time_get());
 }
 
 //constexpr uint32_t os_convert_msec_to_delay_ticks( uint32_t milliseconds )
@@ -288,12 +285,7 @@ bool os_mutex_delete_ex(OS_Mutex& mutex, bool suppressVerbose) noexcept
         OS_Uint status = os_mutex_delete( &mutex );
 	if( status != OS_SUCCESS)
 	{
-		if( mutex )
-		{
-		}
-		else
-		{
-		}
+		(void)suppressVerbose;
 		return false;
 	}
 
@@ -398,15 +390,12 @@ bool os_thread_create_ex_pinned(OS_Thread* txThread, const char* name,
  */
 bool os_thread_delete_ex(OS_Thread *txThread, bool suppressVerbose) noexcept
 {
-    if (txThread == nullptr || *txThread == nullptr) {
+    if (!os_thread_is_live(txThread)) {
         return true;
     }
-    // OsAbstraction maps both os_thread_terminate and os_thread_delete to
-    // vTaskDelete. Calling twice with the same handle corrupts FreeRTOS
-    // ready-blocked lists (LoadProhibited in uxListRemove).
     (void)suppressVerbose;
     os_thread_delete(txThread);
-    *txThread = nullptr;
+    os_thread_clear(txThread);
     if (g_ssp_common_thread_count > 0) {
         --g_ssp_common_thread_count;
     }
@@ -418,7 +407,7 @@ bool os_thread_resume_ex( OS_Thread* thread, bool suppressVerbose )
 	bool success = false;
 	if( thread != nullptr )
 	{
-		if( *thread != NULL )
+		if( os_thread_is_live(thread) )
 		{
 
 			uint32_t result = os_thread_resume(thread);
@@ -446,13 +435,13 @@ bool os_thread_resume_ex( OS_Thread* thread, bool suppressVerbose )
 
 bool os_thread_resume_if_suspended(OS_Thread *thread, bool suppressVerbose) noexcept
 {
-    OS_Uint state = eReady;
+    OS_Uint state = OS_THREAD_READY;
 
     // Get the current state of the thread
     if( OS_SUCCESS == os_thread_info_get(thread, &state) )
     {
 		// Check if the thread is suspended
-                if (state == eSuspended)
+                if (os_thread_state_is_suspended(state))
 		{
 			// If the thread is suspended, attempt to resume it
                         OS_Uint err = os_thread_resume(thread);
@@ -484,7 +473,7 @@ bool os_thread_suspend_ex( OS_Thread* thread, bool suppressVerbose )
 {
     if( thread != nullptr )
     {
-        if( *thread != NULL )
+        if( os_thread_is_live(thread) )
         {
 
             uint32_t result = os_thread_suspend(thread);
