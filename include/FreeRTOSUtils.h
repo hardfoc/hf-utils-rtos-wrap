@@ -10,8 +10,9 @@
 
 #if defined(HF_RTOS_FREERTOS)
 
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
+/* The FreeRTOS backend owns the kernel include layout (flat vs `freertos/`
+ * prefixed) — see os/README.md. Pull it in rather than repeating the probe. */
+#include "OsAbstraction.h"
 
 #ifdef __cplusplus
 extern "C" {
