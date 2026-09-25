@@ -115,9 +115,14 @@ static inline OS_Uint os_thread_create(OS_Thread *t, const char *name,
                                        void (*entry)(OS_Ulong),
                                        OS_Ulong input, uint8_t *stack,
                                        OS_Ulong stack_size, OS_Uint priority,
-                                       OS_Uint /*preempt*/, OS_Ulong /*slice*/,
+                                       OS_Uint preempt, OS_Ulong slice,
                                        OS_Uint auto_start)
 {
+    /* xTaskCreate allocates the stack. stack/preempt/slice stay in the
+     * ThreadX-shaped signature; this backend does not install them. */
+    (void)stack;
+    (void)preempt;
+    (void)slice;
     os_thread_start_t *params =
         (os_thread_start_t *)pvPortMalloc(sizeof(os_thread_start_t));
     if (!params) return 1;
@@ -231,8 +236,10 @@ static inline int os_thread_state_is_suspended(OS_Uint state)
 }
 
 /* Mutex wrappers ---------------------------------------------------------*/
-static inline OS_Uint os_mutex_create(OS_Mutex *m, const char * /*name*/, OS_Uint /*inherit*/)
+static inline OS_Uint os_mutex_create(OS_Mutex *m, const char *name, OS_Uint inherit)
 {
+    (void)name;
+    (void)inherit;
     *m = xSemaphoreCreateMutex();
     return (*m) ? (OS_Uint)OS_SUCCESS : (OS_Uint)1;
 }
@@ -241,8 +248,9 @@ static inline OS_Uint os_mutex_put(OS_Mutex *m)                  { return xSemap
 static inline OS_Uint os_mutex_delete(OS_Mutex *m)               { vSemaphoreDelete(*m); return OS_SUCCESS; }
 
 /* Recursive Mutex wrappers -----------------------------------------------*/
-static inline OS_Uint os_recursive_mutex_create(OS_Mutex *m, const char * /*name*/)
+static inline OS_Uint os_recursive_mutex_create(OS_Mutex *m, const char *name)
 {
+    (void)name;
     *m = xSemaphoreCreateRecursiveMutex();
     return (*m) ? (OS_Uint)OS_SUCCESS : (OS_Uint)1;
 }
@@ -251,8 +259,9 @@ static inline OS_Uint os_recursive_mutex_put(OS_Mutex *m)                  { ret
 static inline OS_Uint os_recursive_mutex_delete(OS_Mutex *m)               { vSemaphoreDelete(*m); return OS_SUCCESS; }
 
 /* Semaphore wrappers -----------------------------------------------------*/
-static inline OS_Uint os_semaphore_create(OS_Semaphore *s, const char* /*name*/, OS_Uint initial)
+static inline OS_Uint os_semaphore_create(OS_Semaphore *s, const char* name, OS_Uint initial)
 {
+    (void)name;
     *s = xSemaphoreCreateCounting(UINT16_MAX, initial);
     return (*s) ? (OS_Uint)OS_SUCCESS : (OS_Uint)1;
 }
@@ -267,9 +276,11 @@ static inline OS_Uint os_semaphore_info_get(OS_Semaphore *s, OS_Ulong *count)
 }
 
 /* Queue wrappers ---------------------------------------------------------*/
-static inline OS_Uint os_queue_create(OS_Queue *q, const char* /*name*/, OS_Uint item_words,
-                                      void* /*store*/, OS_Ulong length)
+static inline OS_Uint os_queue_create(OS_Queue *q, const char* name, OS_Uint item_words,
+                                      void* store, OS_Ulong length)
 {
+    (void)name;
+    (void)store;
     *q = xQueueCreate(length, item_words * sizeof(uint32_t));
     return (*q) ? (OS_Uint)OS_SUCCESS : (OS_Uint)1;
 }
@@ -278,8 +289,9 @@ static inline OS_Uint os_queue_send(OS_Queue *q, void *msg, OS_Ulong wait)    { 
 static inline OS_Uint os_queue_receive(OS_Queue *q, void *msg, OS_Ulong wait) { return xQueueReceive(*q, msg, wait) ? (OS_Uint)OS_SUCCESS : (OS_Uint)1; }
 
 /* Event group wrappers ---------------------------------------------------*/
-static inline OS_Uint os_event_group_create(OS_EventGroup *g, const char* /*name*/)
+static inline OS_Uint os_event_group_create(OS_EventGroup *g, const char* name)
 {
+    (void)name;
     *g = xEventGroupCreate();
     return (*g) ? (OS_Uint)OS_SUCCESS : (OS_Uint)1;
 }

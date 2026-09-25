@@ -147,7 +147,7 @@ uint32_t os_get_processor_cycle_count(){
  * @param name - The name fo rthe mutex
  * @param inherit - The inherit property for the mutex
  */
-bool os_mutex_create_ex(OS_Mutex& mutex, const char* mutexName, OS_Uint inherit, bool suppressVerbose) noexcept
+bool os_mutex_create_ex(OS_Mutex& mutex, const char* mutexName, OS_Uint inherit, [[maybe_unused]] bool suppressVerbose) noexcept
 {
 	if( mutexName != nullptr )
 	{
@@ -168,7 +168,7 @@ bool os_mutex_create_ex(OS_Mutex& mutex, const char* mutexName, OS_Uint inherit,
 	return false;
 }
 
-bool os_mutex_create_p(OS_Mutex* mutex, const char* mutexName, OS_Uint inherit, bool suppressVerbose) noexcept
+bool os_mutex_create_p(OS_Mutex* mutex, const char* mutexName, OS_Uint inherit, [[maybe_unused]] bool suppressVerbose) noexcept
 {
 	if( mutexName != nullptr )
 	{
@@ -196,7 +196,7 @@ bool os_mutex_create_p(OS_Mutex* mutex, const char* mutexName, OS_Uint inherit, 
  * @param suppressVerbose Flag to suppress verbose output.
  * @return true if the mutex was successfully acquired, false otherwise.
  */
-bool os_mutex_get_ex(OS_Mutex& mutex, OS_Ulong wait_option, bool suppressVerbose) noexcept
+bool os_mutex_get_ex(OS_Mutex& mutex, OS_Ulong wait_option, [[maybe_unused]] bool suppressVerbose) noexcept
 {
     OS_Uint err = os_mutex_get(&mutex, wait_option);
 
@@ -218,7 +218,7 @@ bool os_mutex_get_ex(OS_Mutex& mutex, OS_Ulong wait_option, bool suppressVerbose
  * @param suppressVerbose Flag to suppress verbose output.
  * @return true if the mutex was successfully acquired, false otherwise.
  */
-bool os_mutex_get_p(OS_Mutex* mutex, OS_Ulong wait_option, bool suppressVerbose) noexcept
+bool os_mutex_get_p(OS_Mutex* mutex, OS_Ulong wait_option, [[maybe_unused]] bool suppressVerbose) noexcept
 {
     OS_Uint err = os_mutex_get(mutex, wait_option);
 
@@ -239,7 +239,7 @@ bool os_mutex_get_p(OS_Mutex* mutex, OS_Ulong wait_option, bool suppressVerbose)
  * @param suppressVerbose Flag to suppress verbose output.
  * @return true if the mutex was successfully released, false otherwise.
  */
-bool os_mutex_put_ex(OS_Mutex& mutex, bool suppressVerbose) noexcept
+bool os_mutex_put_ex(OS_Mutex& mutex, [[maybe_unused]] bool suppressVerbose) noexcept
 {
     OS_Uint err = os_mutex_put(&mutex);
 
@@ -260,7 +260,7 @@ bool os_mutex_put_ex(OS_Mutex& mutex, bool suppressVerbose) noexcept
  * @param suppressVerbose Flag to suppress verbose output.
  * @return true if the mutex was successfully released, false otherwise.
  */
-bool os_mutex_put_p(OS_Mutex* mutex, bool suppressVerbose) noexcept
+bool os_mutex_put_p(OS_Mutex* mutex, [[maybe_unused]] bool suppressVerbose) noexcept
 {
     OS_Uint err = os_mutex_put(mutex);
 
@@ -280,7 +280,7 @@ bool os_mutex_put_p(OS_Mutex* mutex, bool suppressVerbose) noexcept
  *
  * @param mutex - The OS mutex to delete
  **/
-bool os_mutex_delete_ex(OS_Mutex& mutex, bool suppressVerbose) noexcept
+bool os_mutex_delete_ex(OS_Mutex& mutex, [[maybe_unused]] bool suppressVerbose) noexcept
 {
         OS_Uint status = os_mutex_delete( &mutex );
 	if( status != OS_SUCCESS)
@@ -297,7 +297,7 @@ bool os_mutex_delete_ex(OS_Mutex& mutex, bool suppressVerbose) noexcept
  *
  * @param mutex - The OS mutex to delete
  **/
-bool os_mutex_delete_p(OS_Mutex* mutex, bool suppressVerbose) noexcept
+bool os_mutex_delete_p(OS_Mutex* mutex, [[maybe_unused]] bool suppressVerbose) noexcept
 {
         OS_Uint status = os_mutex_delete( mutex );
 	if( status != OS_SUCCESS)
@@ -343,7 +343,7 @@ bool os_thread_create_ex(OS_Thread* txThread, const char* name,
                     void (*entry_function)(OS_Ulong id), OS_Ulong entry_input,
                     uint8_t* stack, OS_Ulong stackSizeBytes, OS_Uint priority,
                     OS_Uint preempt_threshold, OS_Ulong timeSliceAllowed,
-                    OS_Uint auto_start, bool suppressVerbose ) noexcept
+                    OS_Uint auto_start, [[maybe_unused]] bool suppressVerbose ) noexcept
 {
     /// Create the OS Thread
     OS_Uint err = os_thread_create(txThread, const_cast<char*>(name), entry_function, entry_input, stack, stackSizeBytes, priority, preempt_threshold, timeSliceAllowed, auto_start);
@@ -367,7 +367,7 @@ bool os_thread_create_ex_pinned(OS_Thread* txThread, const char* name,
                     void (*entry_function)(OS_Ulong id), OS_Ulong entry_input,
                     uint8_t* stack, OS_Ulong stackSizeBytes, OS_Uint priority,
                     OS_Uint preempt_threshold, OS_Ulong timeSliceAllowed,
-                    OS_Uint auto_start, int core_id, bool suppressVerbose ) noexcept
+                    OS_Uint auto_start, int core_id, [[maybe_unused]] bool suppressVerbose ) noexcept
 {
     OS_Uint err = os_thread_create_pinned(txThread, const_cast<char*>(name),
                                           entry_function, entry_input, stack,
@@ -388,7 +388,7 @@ bool os_thread_create_ex_pinned(OS_Thread* txThread, const char* name,
  * @param txThread Pointer to the OS thread control block to be deleted.
  * @return true if the thread was successfully deleted, false otherwise.
  */
-bool os_thread_delete_ex(OS_Thread *txThread, bool suppressVerbose) noexcept
+bool os_thread_delete_ex(OS_Thread *txThread, [[maybe_unused]] bool suppressVerbose) noexcept
 {
     if (!os_thread_is_live(txThread)) {
         return true;
@@ -402,7 +402,7 @@ bool os_thread_delete_ex(OS_Thread *txThread, bool suppressVerbose) noexcept
     return true;
 }
 
-bool os_thread_resume_ex( OS_Thread* thread, bool suppressVerbose )
+bool os_thread_resume_ex( OS_Thread* thread, [[maybe_unused]] bool suppressVerbose )
 {
 	bool success = false;
 	if( thread != nullptr )
@@ -433,7 +433,7 @@ bool os_thread_resume_ex( OS_Thread* thread, bool suppressVerbose )
 	return success;
 }
 
-bool os_thread_resume_if_suspended(OS_Thread *thread, bool suppressVerbose) noexcept
+bool os_thread_resume_if_suspended(OS_Thread *thread, [[maybe_unused]] bool suppressVerbose) noexcept
 {
     OS_Uint state = OS_THREAD_READY;
 
@@ -469,7 +469,7 @@ bool os_thread_resume_if_suspended(OS_Thread *thread, bool suppressVerbose) noex
 }
 
 
-bool os_thread_suspend_ex( OS_Thread* thread, bool suppressVerbose )
+bool os_thread_suspend_ex( OS_Thread* thread, [[maybe_unused]] bool suppressVerbose )
 {
     if( thread != nullptr )
     {
@@ -510,7 +510,7 @@ bool os_thread_suspend_ex( OS_Thread* thread, bool suppressVerbose )
  * @param messageSizeInWords - The size of the messages that will be stored in the queue
  */
 bool os_queue_create_ex(OS_Queue& queue, const char* queueName, OS_Uint messageSizeInWords,
-                   void* queueStorage, OS_Ulong queueSize, bool suppressVerbose) noexcept
+                   void* queueStorage, OS_Ulong queueSize, [[maybe_unused]] bool suppressVerbose) noexcept
 {
     if(queueName != nullptr)
     {
@@ -536,7 +536,7 @@ bool os_queue_create_ex(OS_Queue& queue, const char* queueName, OS_Uint messageS
  *
  * @param queue - The OS queue to delete
  **/
-bool os_queue_delete_ex(OS_Queue& queue, bool suppressVerbose) noexcept
+bool os_queue_delete_ex(OS_Queue& queue, [[maybe_unused]] bool suppressVerbose) noexcept
 {
     auto status = os_queue_delete(&queue);
     if(status != OS_SUCCESS)
@@ -560,7 +560,7 @@ bool os_queue_delete_ex(OS_Queue& queue, bool suppressVerbose) noexcept
  * @param message - The message to send
  * @param wait_option - The option on how to wait if the queue is full
  */
-bool os_queue_send_ex(OS_Queue& queue, void* message, OS_Ulong wait_option, bool suppressVerbose) noexcept {
+bool os_queue_send_ex(OS_Queue& queue, void* message, OS_Ulong wait_option, [[maybe_unused]] bool suppressVerbose) noexcept {
     OS_Uint status = os_queue_send(&queue, message, wait_option);
     if (status == OS_SUCCESS) {
         return true;
@@ -576,7 +576,7 @@ bool os_queue_send_ex(OS_Queue& queue, void* message, OS_Ulong wait_option, bool
  * @param message - The received message
  * @param wait_option - The option on how to wait if the queue is empty
  */
-bool os_queue_receive_ex(OS_Queue& queue, void* message, OS_Ulong wait_option, bool suppressVerbose) noexcept {
+bool os_queue_receive_ex(OS_Queue& queue, void* message, OS_Ulong wait_option, [[maybe_unused]] bool suppressVerbose) noexcept {
     OS_Uint status = os_queue_receive(&queue, message, wait_option);
     if (status == OS_SUCCESS) {
         return true;
@@ -603,7 +603,7 @@ bool os_queue_receive_ex(OS_Queue& queue, void* message, OS_Ulong wait_option, b
 bool os_timer_create_ex ( OS_Timer& timer, const char* name, void (*callback)(uint32_t),
                      uint32_t callbackExpirationInput, uint32_t initialTimeoutTicks,
                      uint32_t rescheduleTimeoutTicks, OS_Uint autoActivate,
-                     bool suppressVerbose ) noexcept
+                     [[maybe_unused]] bool suppressVerbose ) noexcept
 {
 	if( name != nullptr )
 	{
@@ -632,7 +632,7 @@ bool os_timer_create_ex ( OS_Timer& timer, const char* name, void (*callback)(ui
   *
   * @param timer The timer to delete.
   **/
-bool os_timer_deactivate_and_delete_ex( OS_Timer& timer, bool suppressVerbose) noexcept
+bool os_timer_deactivate_and_delete_ex( OS_Timer& timer, [[maybe_unused]] bool suppressVerbose) noexcept
 {
 	// Stop the timer first
 	auto status = os_timer_deactivate(&timer);
@@ -656,7 +656,7 @@ bool os_timer_deactivate_and_delete_ex( OS_Timer& timer, bool suppressVerbose) n
 	return status == OS_SUCCESS;
 }
 
-bool os_timer_activate_ex( OS_Timer& timer, bool suppressVerbose) noexcept
+bool os_timer_activate_ex( OS_Timer& timer, [[maybe_unused]] bool suppressVerbose) noexcept
 {
    auto status = os_timer_activate(&timer);
    if (status != OS_SUCCESS)
@@ -680,7 +680,7 @@ bool os_timer_activate_ex( OS_Timer& timer, bool suppressVerbose) noexcept
    return (status == OS_SUCCESS);
 }
 
-bool os_timer_deactivate_ex( OS_Timer& timer, bool suppressVerbose) noexcept
+bool os_timer_deactivate_ex( OS_Timer& timer, [[maybe_unused]] bool suppressVerbose) noexcept
 {
 	auto status = os_timer_deactivate(&timer);
 	if (status != OS_SUCCESS)
@@ -716,7 +716,7 @@ bool os_timer_deactivate_ex( OS_Timer& timer, bool suppressVerbose) noexcept
  * @param initial_count Initial count of the semaphore.
  * @return true if the semaphore was successfully created, false otherwise.
  */
-bool os_semaphore_create_ex(OS_Semaphore* txSemaphore, const char* name, OS_Uint initial_count, bool suppressVerbose) noexcept
+bool os_semaphore_create_ex(OS_Semaphore* txSemaphore, const char* name, OS_Uint initial_count, [[maybe_unused]] bool suppressVerbose) noexcept
 {
     OS_Uint err = os_semaphore_create(txSemaphore, const_cast<char*>(name), initial_count);
 
@@ -736,7 +736,7 @@ bool os_semaphore_create_ex(OS_Semaphore* txSemaphore, const char* name, OS_Uint
  * @param txSemaphore Pointer to the OS semaphore control block to be deleted.
  * @return true if the semaphore was successfully deleted, false otherwise.
  */
-bool os_semaphore_delete_ex(OS_Semaphore *txSemaphore, bool suppressVerbose) noexcept
+bool os_semaphore_delete_ex(OS_Semaphore *txSemaphore, [[maybe_unused]] bool suppressVerbose) noexcept
 {
     OS_Uint err = os_semaphore_delete(txSemaphore);
 
@@ -756,7 +756,7 @@ bool os_semaphore_delete_ex(OS_Semaphore *txSemaphore, bool suppressVerbose) noe
  * @param txSemaphore Pointer to the OS semaphore control block.
  * @return true if the semaphore was successfully released, false otherwise.
  */
-bool os_semaphore_put_ex(OS_Semaphore* txSemaphore, bool suppressVerbose) noexcept
+bool os_semaphore_put_ex(OS_Semaphore* txSemaphore, [[maybe_unused]] bool suppressVerbose) noexcept
 {
     OS_Uint err = os_semaphore_put(txSemaphore);
 
@@ -777,7 +777,7 @@ bool os_semaphore_put_ex(OS_Semaphore* txSemaphore, bool suppressVerbose) noexce
  * @param wait_option Specifies the maximum time to wait for the semaphore.
  * @return true if the semaphore was successfully acquired, false otherwise.
  */
-bool os_semaphore_get_ex(OS_Semaphore* txSemaphore, OS_Ulong wait_option, bool suppressVerbose) noexcept
+bool os_semaphore_get_ex(OS_Semaphore* txSemaphore, OS_Ulong wait_option, [[maybe_unused]] bool suppressVerbose) noexcept
 {
     OS_Uint err = os_semaphore_get(txSemaphore, wait_option);
 
@@ -797,7 +797,7 @@ bool os_semaphore_get_ex(OS_Semaphore* txSemaphore, OS_Ulong wait_option, bool s
  * @param txSemaphore Pointer to the OS semaphore control block.
  * @return the count of the semaphore.
  */
-OS_Ulong os_semaphore_get_count_ex(OS_Semaphore *txSemaphore, bool suppressVerbose) noexcept
+OS_Ulong os_semaphore_get_count_ex(OS_Semaphore *txSemaphore, [[maybe_unused]] bool suppressVerbose) noexcept
 {
     OS_Ulong count;
     OS_Uint err = os_semaphore_info_get(txSemaphore, &count);
@@ -824,7 +824,7 @@ OS_Ulong os_semaphore_get_count_ex(OS_Semaphore *txSemaphore, bool suppressVerbo
  * @param eventFlags - The OS event flags to create
  * @param name - The name for the event flag group
  */
-bool os_event_flags_create_ex(OS_EventGroup& eventFlags, const char* name, bool suppressVerbose) noexcept
+bool os_event_flags_create_ex(OS_EventGroup& eventFlags, const char* name, [[maybe_unused]] bool suppressVerbose) noexcept
 {
     if(name != nullptr)
     {
@@ -850,7 +850,7 @@ bool os_event_flags_create_ex(OS_EventGroup& eventFlags, const char* name, bool 
  *
  * @param eventFlags - The OS event flags to delete
  **/
-bool os_event_flags_delete_ex(OS_EventGroup& eventFlags, bool suppressVerbose) noexcept
+bool os_event_flags_delete_ex(OS_EventGroup& eventFlags, [[maybe_unused]] bool suppressVerbose) noexcept
 {
     auto status = os_event_group_delete(&eventFlags);
     if(status != OS_SUCCESS)
@@ -873,7 +873,7 @@ bool os_event_flags_delete_ex(OS_EventGroup& eventFlags, bool suppressVerbose) n
  * @param eventFlags - The OS event flags to set
  * @param flagsToSet - The flags to set
  */
-bool os_event_flags_set_ex(OS_EventGroup& eventFlags, OS_Ulong flagsToSet, bool suppressVerbose) noexcept {
+bool os_event_flags_set_ex(OS_EventGroup& eventFlags, OS_Ulong flagsToSet, [[maybe_unused]] bool suppressVerbose) noexcept {
     OS_Uint status = os_event_group_set(&eventFlags, flagsToSet);
     if (status == OS_SUCCESS) {
         return true;
@@ -888,7 +888,7 @@ bool os_event_flags_set_ex(OS_EventGroup& eventFlags, OS_Ulong flagsToSet, bool 
  * @param eventFlags - The OS event flags to set
  * @param flagsToClear - The flags to clear
  */
-bool os_event_flags_clear_ex(OS_EventGroup& eventFlags, OS_Ulong flagsToClear, bool suppressVerbose) noexcept {
+bool os_event_flags_clear_ex(OS_EventGroup& eventFlags, OS_Ulong flagsToClear, [[maybe_unused]] bool suppressVerbose) noexcept {
     OS_Uint status = os_event_group_clear(&eventFlags, flagsToClear);
     if (status == OS_SUCCESS) {
         return true;
@@ -907,7 +907,7 @@ bool os_event_flags_clear_ex(OS_EventGroup& eventFlags, OS_Ulong flagsToClear, b
  * @param wait_option - The option on how to wait if the flags are not available
  */
 bool os_event_flags_get_ex(OS_EventGroup& eventFlags, OS_Ulong flagsToGet, OS_Uint getOption,
-                     OS_Ulong& actualFlags, OS_Ulong wait_option, bool suppressVerbose) noexcept {
+                     OS_Ulong& actualFlags, OS_Ulong wait_option, [[maybe_unused]] bool suppressVerbose) noexcept {
     OS_Uint status = os_event_group_get(&eventFlags, flagsToGet, getOption, &actualFlags, wait_option);
     if (status == OS_SUCCESS) {
         return true;
@@ -920,7 +920,7 @@ bool os_event_flags_get_ex(OS_EventGroup& eventFlags, OS_Ulong flagsToGet, OS_Ui
 // STACK FAULT HANDLER
 //============================================================================================//
 
-void os_stack_fault_handler(OS_Thread* thread )
+void os_stack_fault_handler([[maybe_unused]] OS_Thread* thread)
 {
 }
 

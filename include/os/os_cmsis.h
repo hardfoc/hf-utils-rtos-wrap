@@ -35,6 +35,15 @@ typedef void*                  OS_StreamBuffer;
 typedef unsigned long          OS_Ulong;
 typedef unsigned int           OS_Uint;
 
+/* C++ `T x = {0}` only initializes the first member and trips
+ * -Wmissing-field-initializers. `{}` value-initializes every member.
+ * C keeps the classic zero initializer, which does not warn. */
+#ifdef __cplusplus
+#define OS_ZERO_INIT {}
+#else
+#define OS_ZERO_INIT {0}
+#endif
+
 enum {
     OS_WAIT_FOREVER = (int)osWaitForever,
     OS_NO_WAIT      = 0,
@@ -79,7 +88,7 @@ static inline OS_Uint os_thread_spawn(OS_Thread *t, const char *name,
     if (t == 0 || entry == 0) {
         return (OS_Uint)1;
     }
-    osThreadAttr_t attr = {0};
+    osThreadAttr_t attr = OS_ZERO_INIT;
     attr.name = name;
     attr.stack_size = (uint32_t)stack_size;
     attr.stack_mem = stack;
@@ -147,15 +156,15 @@ static inline int os_get_current_core_id(void) { return 0; }
 
 static inline OS_Uint os_thread_resume(OS_Thread *t)
 {
-    return (t && osThreadResume(*t) == osOK) ? OS_SUCCESS : (OS_Uint)1;
+    return (t && osThreadResume(*t) == osOK) ? (OS_Uint)OS_SUCCESS : (OS_Uint)1;
 }
 static inline OS_Uint os_thread_suspend(OS_Thread *t)
 {
-    return (t && osThreadSuspend(*t) == osOK) ? OS_SUCCESS : (OS_Uint)1;
+    return (t && osThreadSuspend(*t) == osOK) ? (OS_Uint)OS_SUCCESS : (OS_Uint)1;
 }
 static inline OS_Uint os_thread_delete(OS_Thread *t)
 {
-    return (t && osThreadTerminate(*t) == osOK) ? OS_SUCCESS : (OS_Uint)1;
+    return (t && osThreadTerminate(*t) == osOK) ? (OS_Uint)OS_SUCCESS : (OS_Uint)1;
 }
 static inline OS_Uint os_thread_terminate(OS_Thread *t)
 {
@@ -170,7 +179,7 @@ static inline OS_Uint os_thread_info_get(OS_Thread *t, OS_Uint *state)
 }
 static inline OS_Uint os_thread_sleep(OS_Ulong ticks)
 {
-    return (osDelay((uint32_t)ticks) == osOK) ? OS_SUCCESS : (OS_Uint)1;
+    return (osDelay((uint32_t)ticks) == osOK) ? (OS_Uint)OS_SUCCESS : (OS_Uint)1;
 }
 
 enum {
@@ -201,34 +210,34 @@ static inline int os_thread_state_is_suspended(OS_Uint state)
 
 static inline OS_Uint os_mutex_create(OS_Mutex *m, const char *name, OS_Uint inherit)
 {
-    osMutexAttr_t attr = {0};
+    osMutexAttr_t attr = OS_ZERO_INIT;
     attr.name = name;
     if (inherit) {
         attr.attr_bits = osMutexPrioInherit;
     }
     *m = osMutexNew(&attr);
-    return (*m) ? OS_SUCCESS : (OS_Uint)1;
+    return (*m) ? (OS_Uint)OS_SUCCESS : (OS_Uint)1;
 }
 static inline OS_Uint os_mutex_get(OS_Mutex *m, OS_Ulong wait)
 {
-    return (osMutexAcquire(*m, (uint32_t)wait) == osOK) ? OS_SUCCESS : (OS_Uint)1;
+    return (osMutexAcquire(*m, (uint32_t)wait) == osOK) ? (OS_Uint)OS_SUCCESS : (OS_Uint)1;
 }
 static inline OS_Uint os_mutex_put(OS_Mutex *m)
 {
-    return (osMutexRelease(*m) == osOK) ? OS_SUCCESS : (OS_Uint)1;
+    return (osMutexRelease(*m) == osOK) ? (OS_Uint)OS_SUCCESS : (OS_Uint)1;
 }
 static inline OS_Uint os_mutex_delete(OS_Mutex *m)
 {
-    return (osMutexDelete(*m) == osOK) ? OS_SUCCESS : (OS_Uint)1;
+    return (osMutexDelete(*m) == osOK) ? (OS_Uint)OS_SUCCESS : (OS_Uint)1;
 }
 
 static inline OS_Uint os_recursive_mutex_create(OS_Mutex *m, const char *name)
 {
-    osMutexAttr_t attr = {0};
+    osMutexAttr_t attr = OS_ZERO_INIT;
     attr.name = name;
     attr.attr_bits = osMutexRecursive | osMutexPrioInherit;
     *m = osMutexNew(&attr);
-    return (*m) ? OS_SUCCESS : (OS_Uint)1;
+    return (*m) ? (OS_Uint)OS_SUCCESS : (OS_Uint)1;
 }
 static inline OS_Uint os_recursive_mutex_get(OS_Mutex *m, OS_Ulong wait)
 {
@@ -245,22 +254,22 @@ static inline OS_Uint os_recursive_mutex_delete(OS_Mutex *m)
 
 static inline OS_Uint os_semaphore_create(OS_Semaphore *s, const char *name, OS_Uint initial)
 {
-    osSemaphoreAttr_t attr = {0};
+    osSemaphoreAttr_t attr = OS_ZERO_INIT;
     attr.name = name;
     *s = osSemaphoreNew(0xFFFFu, initial, &attr);
-    return (*s) ? OS_SUCCESS : (OS_Uint)1;
+    return (*s) ? (OS_Uint)OS_SUCCESS : (OS_Uint)1;
 }
 static inline OS_Uint os_semaphore_delete(OS_Semaphore *s)
 {
-    return (osSemaphoreDelete(*s) == osOK) ? OS_SUCCESS : (OS_Uint)1;
+    return (osSemaphoreDelete(*s) == osOK) ? (OS_Uint)OS_SUCCESS : (OS_Uint)1;
 }
 static inline OS_Uint os_semaphore_put(OS_Semaphore *s)
 {
-    return (osSemaphoreRelease(*s) == osOK) ? OS_SUCCESS : (OS_Uint)1;
+    return (osSemaphoreRelease(*s) == osOK) ? (OS_Uint)OS_SUCCESS : (OS_Uint)1;
 }
 static inline OS_Uint os_semaphore_get(OS_Semaphore *s, OS_Ulong wait)
 {
-    return (osSemaphoreAcquire(*s, (uint32_t)wait) == osOK) ? OS_SUCCESS : (OS_Uint)1;
+    return (osSemaphoreAcquire(*s, (uint32_t)wait) == osOK) ? (OS_Uint)OS_SUCCESS : (OS_Uint)1;
 }
 static inline OS_Uint os_semaphore_info_get(OS_Semaphore *s, OS_Ulong *count)
 {
@@ -273,45 +282,45 @@ static inline OS_Uint os_semaphore_info_get(OS_Semaphore *s, OS_Ulong *count)
 static inline OS_Uint os_queue_create(OS_Queue *q, const char *name, OS_Uint item_words,
                                       void * /*store*/, OS_Ulong length)
 {
-    osMessageQueueAttr_t attr = {0};
+    osMessageQueueAttr_t attr = OS_ZERO_INIT;
     attr.name = name;
     *q = osMessageQueueNew((uint32_t)length, item_words * sizeof(uint32_t), &attr);
-    return (*q) ? OS_SUCCESS : (OS_Uint)1;
+    return (*q) ? (OS_Uint)OS_SUCCESS : (OS_Uint)1;
 }
 static inline OS_Uint os_queue_delete(OS_Queue *q)
 {
-    return (osMessageQueueDelete(*q) == osOK) ? OS_SUCCESS : (OS_Uint)1;
+    return (osMessageQueueDelete(*q) == osOK) ? (OS_Uint)OS_SUCCESS : (OS_Uint)1;
 }
 static inline OS_Uint os_queue_send(OS_Queue *q, void *msg, OS_Ulong wait)
 {
-    return (osMessageQueuePut(*q, msg, 0, (uint32_t)wait) == osOK) ? OS_SUCCESS
+    return (osMessageQueuePut(*q, msg, 0, (uint32_t)wait) == osOK) ? (OS_Uint)OS_SUCCESS
                                                                    : (OS_Uint)1;
 }
 static inline OS_Uint os_queue_receive(OS_Queue *q, void *msg, OS_Ulong wait)
 {
-    return (osMessageQueueGet(*q, msg, 0, (uint32_t)wait) == osOK) ? OS_SUCCESS
+    return (osMessageQueueGet(*q, msg, 0, (uint32_t)wait) == osOK) ? (OS_Uint)OS_SUCCESS
                                                                    : (OS_Uint)1;
 }
 
 static inline OS_Uint os_event_group_create(OS_EventGroup *g, const char *name)
 {
-    osEventFlagsAttr_t attr = {0};
+    osEventFlagsAttr_t attr = OS_ZERO_INIT;
     attr.name = name;
     *g = osEventFlagsNew(&attr);
-    return (*g) ? OS_SUCCESS : (OS_Uint)1;
+    return (*g) ? (OS_Uint)OS_SUCCESS : (OS_Uint)1;
 }
 static inline OS_Uint os_event_group_delete(OS_EventGroup *g)
 {
-    return (osEventFlagsDelete(*g) == osOK) ? OS_SUCCESS : (OS_Uint)1;
+    return (osEventFlagsDelete(*g) == osOK) ? (OS_Uint)OS_SUCCESS : (OS_Uint)1;
 }
 static inline OS_Uint os_event_group_set(OS_EventGroup *g, OS_Ulong flags)
 {
-    return (osEventFlagsSet(*g, (uint32_t)flags) != osFlagsError) ? OS_SUCCESS
+    return (osEventFlagsSet(*g, (uint32_t)flags) != osFlagsError) ? (OS_Uint)OS_SUCCESS
                                                                   : (OS_Uint)1;
 }
 static inline OS_Uint os_event_group_clear(OS_EventGroup *g, OS_Ulong flags)
 {
-    return (osEventFlagsClear(*g, (uint32_t)flags) != osFlagsError) ? OS_SUCCESS
+    return (osEventFlagsClear(*g, (uint32_t)flags) != osFlagsError) ? (OS_Uint)OS_SUCCESS
                                                                     : (OS_Uint)1;
 }
 static inline OS_Uint os_event_group_get(OS_EventGroup *g, OS_Ulong flags, OS_Uint option,
@@ -322,7 +331,7 @@ static inline OS_Uint os_event_group_get(OS_EventGroup *g, OS_Ulong flags, OS_Ui
     if (actual) {
         *actual = (OS_Ulong)got;
     }
-    return (got & osFlagsError) ? (OS_Uint)1 : OS_SUCCESS;
+    return (got & osFlagsError) ? (OS_Uint)1 : (OS_Uint)OS_SUCCESS;
 }
 
 typedef struct {
@@ -348,7 +357,7 @@ static inline OS_Uint os_timer_create(OS_Timer *t, const char *name,
     }
     params->cb = cb;
     params->id = id;
-    osTimerAttr_t attr = {0};
+    osTimerAttr_t attr = OS_ZERO_INIT;
     attr.name = name;
     const osTimerType_t type = (reload != 0u) ? osTimerPeriodic : osTimerOnce;
     *t = osTimerNew(os_cmsis_timer_entry, type, params, &attr);
@@ -357,22 +366,22 @@ static inline OS_Uint os_timer_create(OS_Timer *t, const char *name,
         return (OS_Uint)1;
     }
     if (auto_act) {
-        return (osTimerStart(*t, (uint32_t)initial) == osOK) ? OS_SUCCESS : (OS_Uint)1;
+        return (osTimerStart(*t, (uint32_t)initial) == osOK) ? (OS_Uint)OS_SUCCESS : (OS_Uint)1;
     }
     (void)initial;
     return OS_SUCCESS;
 }
 static inline OS_Uint os_timer_delete(OS_Timer *t)
 {
-    return (osTimerDelete(*t) == osOK) ? OS_SUCCESS : (OS_Uint)1;
+    return (osTimerDelete(*t) == osOK) ? (OS_Uint)OS_SUCCESS : (OS_Uint)1;
 }
 static inline OS_Uint os_timer_activate(OS_Timer *t)
 {
-    return (osTimerStart(*t, 1u) == osOK) ? OS_SUCCESS : (OS_Uint)1;
+    return (osTimerStart(*t, 1u) == osOK) ? (OS_Uint)OS_SUCCESS : (OS_Uint)1;
 }
 static inline OS_Uint os_timer_deactivate(OS_Timer *t)
 {
-    return (osTimerStop(*t) == osOK) ? OS_SUCCESS : (OS_Uint)1;
+    return (osTimerStop(*t) == osOK) ? (OS_Uint)OS_SUCCESS : (OS_Uint)1;
 }
 
 static inline OS_Uint os_stream_buffer_create(OS_StreamBuffer *b, size_t capacity,
