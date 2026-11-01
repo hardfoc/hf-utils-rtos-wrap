@@ -45,7 +45,9 @@ public:
    * @return Current time in microseconds from the RTOS tick counter.
    */
   static uint64_t GetCurrentTimeUs() noexcept {
-#if defined(HF_RTOS_NONE) || defined(HF_MCU_FAMILY_NONE)
+#if (defined(HF_RTOS_NONE) || defined(HF_MCU_FAMILY_NONE)) && defined(HF_RTOS_NONE_EXTERNAL_CLOCK)
+    return hf_os_none_clock_us();
+#elif defined(HF_RTOS_NONE) || defined(HF_MCU_FAMILY_NONE)
     return 0;
 #else
     const uint32_t ticks = static_cast<uint32_t>(os_time_get());

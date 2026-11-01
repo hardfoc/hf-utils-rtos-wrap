@@ -45,7 +45,24 @@ enum {
     OS_INHERIT      = 0
 };
 
+/* ── Clock ─────────────────────────────────────────────────────────────
+ * Without a scheduler there is no tick, so by default time stands still:
+ * os_time_get() returns 0 and delays return at once.
+ *
+ * Define HF_RTOS_NONE_EXTERNAL_CLOCK to take time from the integrator
+ * instead. The integrator then provides the two functions below (a host
+ * test build backs them with a fake clock; a bare-metal image could back
+ * them with a hardware timer). One tick is one millisecond, matching
+ * os_convert_msec_to_delay_ticks() for this backend. */
+#if defined(HF_RTOS_NONE_EXTERNAL_CLOCK)
+/** Monotonic time in microseconds. */
+uint64_t hf_os_none_clock_us(void);
+/** Let @p us microseconds pass (a fake clock simply advances). */
+void hf_os_none_delay_us(uint64_t us);
+static inline OS_Ulong os_time_get(void) { return (OS_Ulong)(hf_os_none_clock_us() / 1000U); }
+#else
 static inline OS_Ulong os_time_get(void) { return 0; }
+#endif
 
 /* Thread — no-ops (single-threaded) */
 typedef struct { void (*entry)(OS_Ulong); OS_Ulong arg; } os_thread_start_t;
@@ -75,7 +92,12 @@ static inline OS_Uint os_thread_delete(OS_Thread *t)    { (void)t; return OS_SUC
 static inline OS_Uint os_thread_terminate(OS_Thread *t) { (void)t; return OS_SUCCESS; }
 static inline OS_Uint os_thread_info_get(OS_Thread *t, OS_Uint *state)
 { (void)t; if (state) *state = 0; return OS_SUCCESS; }
+#if defined(HF_RTOS_NONE_EXTERNAL_CLOCK)
+static inline OS_Uint os_thread_sleep(OS_Ulong ticks)
+{ hf_os_none_delay_us((uint64_t)ticks * 1000U); return OS_SUCCESS; }
+#else
 static inline OS_Uint os_thread_sleep(OS_Ulong ticks)   { (void)ticks; return OS_SUCCESS; }
+#endif
 static inline OS_Uint os_thread_yield(void)             { return OS_SUCCESS; }
 static inline int os_kernel_is_running(void)            { return 0; }
 static inline OS_Uint os_thread_is_current(const OS_Thread *t)
