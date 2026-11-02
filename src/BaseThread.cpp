@@ -261,6 +261,12 @@ void BaseThread::WaitForStart() noexcept
      signalSemaphore.WaitUntilSignalled();
 }
 
+/* Without a scheduler nothing runs ThreadEntry(), so waiting for the thread
+ * to report itself running would always time out. HF_RTOS_NONE builds take
+ * these four members from BaseThreadHostStub.cpp, which runs Setup() inline
+ * and lets the caller drive Step() directly. */
+#if !defined(HF_RTOS_NONE)
+
 bool BaseThread::StartThreadAndWaitToVerify(uint32_t startTimeoutMsec) {
     /// Start the thread
     if (Start()) {
@@ -344,3 +350,5 @@ bool BaseThread::ChangePriority(uint32_t newPriority) noexcept
     return false;
 #endif
 }
+
+#endif /* !HF_RTOS_NONE */

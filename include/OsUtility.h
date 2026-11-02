@@ -485,9 +485,25 @@ constexpr uint32_t os_convert_hz_to_delay_ticks(uint32_t frequency)
 extern "C" {
 #endif
 
+#if defined(HF_RTOS_NONE_EXTERNAL_CLOCK)
+/* Time comes from the integrator's clock (see os/os_none.h). */
+static inline void os_delay_msec(uint16_t msec) { hf_os_none_delay_us((uint64_t)msec * 1000U); }
+static inline void os_delay_time(uint32_t t, time_unit_t u)
+{
+  if (u == TIME_UNIT_US) {
+    hf_os_none_delay_us((uint64_t)t);
+  } else if (u == TIME_UNIT_MS) {
+    hf_os_none_delay_us((uint64_t)t * 1000U);
+  } else if (u == TIME_UNIT_S) {
+    hf_os_none_delay_us((uint64_t)t * 1000000U);
+  }
+}
+static inline uint32_t os_get_elapsed_time_msec() { return (uint32_t)(hf_os_none_clock_us() / 1000U); }
+#else
 static inline void os_delay_msec(uint16_t msec) { (void)msec; }
 static inline void os_delay_time(uint32_t t, time_unit_t u) { (void)t; (void)u; }
 static inline uint32_t os_get_elapsed_time_msec() { return 0; }
+#endif
 static inline uint32_t os_get_elapsed_processor_cycle_count(uint32_t s, time_unit_t u) { (void)s; (void)u; return 0; }
 static inline uint32_t os_get_processor_cycle_count() { return 0; }
 static inline void os_stack_fault_handler(OS_Thread* t) { (void)t; }

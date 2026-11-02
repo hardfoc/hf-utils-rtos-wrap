@@ -38,6 +38,25 @@ consumers:
   `HF_OS_FREERTOS_SMP` gates them, derived from `ESP_PLATFORM`,
   `portNUM_PROCESSORS`, and `configNUM_CORES` after the kernel headers are in.
 
+### Time without a scheduler
+
+`os_none.h` has no tick. By default `os_time_get()`, `os_get_elapsed_time_msec()`
+and `RtosTime::GetCurrentTimeUs()` return 0 and every delay returns at once.
+Code that waits for a timeout by polling the clock therefore never times out.
+
+Defining `HF_RTOS_NONE_EXTERNAL_CLOCK` hands time to the integrator, who then
+provides two C functions:
+
+```c
+uint64_t hf_os_none_clock_us(void);      /* monotonic microseconds */
+void     hf_os_none_delay_us(uint64_t);  /* let that much time pass */
+```
+
+The hf-core host build backs them with a fake clock that advances on delays,
+so timeouts expire without real waiting. One tick is one millisecond, the
+same as `os_convert_msec_to_delay_ticks()` for this backend. Without the
+define nothing changes.
+
 ## Adding a backend
 
 1. Add `os_<kernel>.h` implementing the full `OS_*` / `os_*` surface.
