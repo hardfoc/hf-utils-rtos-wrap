@@ -7,7 +7,7 @@
 #include <cstring>
 
 /**
- * @example
+ * @par Example
  * @code
  * #include "SignalSemaphore.h"
  *
@@ -135,7 +135,7 @@ bool SignalSemaphore::EnsureInitialized() noexcept
 }
 
 /**
- * @example
+ * @par Example
  * @code
  * #include "SignalSemaphore.h"
  *

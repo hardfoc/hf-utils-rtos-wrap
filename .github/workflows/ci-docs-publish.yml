@@ -25,4 +25,8 @@ jobs:
     permissions:
       contents: write  # the publish job pushes gh-pages; pull requests never publish
     with:
+      check_commands: |
+        hardfoc-docs check
+        sh tools/docs/check-snippets.sh
+      doxygen_config: Doxyfile
       deploy: true
