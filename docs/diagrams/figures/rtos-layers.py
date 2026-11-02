@@ -37,7 +37,7 @@ def data():
     return {
         "classes": classes,
         "backends": backends,
-        "sources": ["include/*.h:classes", f"{ABSTRACTION}:backend table"],
+        "sources": ["include:classes", f"{ABSTRACTION}:backend table"],
     }
 
 
