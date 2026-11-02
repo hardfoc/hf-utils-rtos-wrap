@@ -22,5 +22,5 @@ Figure module: [`docs/diagrams/figures/rtos-layers.py`](../../docs/diagrams/figu
 
 Drawn from:
 
-- `classes` in [`include/*.h`](../../include/*.h)
+- `classes` in [`include`](../../include)
 - `backend table` in [`include/OsAbstraction.h`](../../include/OsAbstraction.h)
