@@ -1,0 +1,29 @@
+{
+  "_comment": "Markdown lint for a MkDocs Material site: the pages use a few HTML elements (hero, figures, cards) and indented admonition bodies.",
+  "MD013": {
+    "line_length": 120,
+    "tables": false,
+    "code_blocks": false
+  },
+  "MD033": {
+    "allowed_elements": [
+      "div",
+      "span",
+      "picture",
+      "source",
+      "img",
+      "figure",
+      "figcaption",
+      "details",
+      "summary",
+      "br",
+      "a",
+      "kbd",
+      "p",
+      "h1"
+    ]
+  },
+  "MD041": false,
+  "MD046": false,
+  "MD030": false
+}

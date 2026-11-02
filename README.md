@@ -1,181 +1,115 @@
-# hf-utils-rtos-wrap
+# RTOS Wrapper
 
-Hardware-agnostic RTOS helper library for the HardFOC stack. Wraps FreeRTOS
-primitives with modern C++ classes and adds three lock-free / lock-light
-generic templates used pervasively by middleware and apps.
+C++ classes for threads, mutexes, semaphores, queues, event flags and timers over one portability layer, with
+backends for FreeRTOS, ThreadX, CMSIS-RTOS2 and no RTOS at all.
 
-Targets FreeRTOS kernel **11.1.x** (ESP-IDF v5.5 on ESP32-S3 today). Public
-surfaces use plain C++ types — `uint32_t`, `enum class`, `std::chrono`-friendly
-millisecond timeouts. There are **no** `OS_Ulong`, `OS_OR`, `OS_AND`,
-`OS_WAIT_FOREVER` leaks across the library boundary; pass `UINT32_MAX` for an
-infinite wait.
+[![Docs](https://github.com/hardfoc/hf-utils-rtos-wrap/actions/workflows/ci-docs-publish.yml/badge.svg?branch=main)](https://hardfoc.github.io/hf-utils-rtos-wrap/)
+[![License: GPL-3.0](https://img.shields.io/badge/license-GPL--3.0-blue)](LICENSE)
 
-This library is the **deepest** node in the HardFOC submodule chain — it must
-not include from any sibling or parent. See the layering rules in the project
-[`AGENTS.md`](../../../../../../AGENTS.md).
+**Documentation: <https://hardfoc.github.io/hf-utils-rtos-wrap/>**
 
----
+<!-- figure: rtos-layers -->
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/diagrams/rtos-layers.dark.svg">
+  <img src="docs/diagrams/rtos-layers.svg"
+    alt="Layer diagram: your code uses the C++ wrapper classes, which call the C portability layer of
+    OsAbstraction.h and OsUtility.h, which includes one backend header chosen at build time: FreeRTOS,
+    ThreadX, CMSIS-RTOS2, or the no-RTOS backend for host tests.">
+</picture>
+<!-- /figure -->
 
-## Header summary
+## In 30 seconds
 
-Required by project `AGENTS.md`: every header carries `@file` / `@brief`,
-a thread-safety note, and an allocation-behavior note.
+Derive from `BaseThread`, give it a stack, start it:
 
-| Header | Purpose | Thread-safety | Allocation |
-|---|---|---|---|
-| [`OsAbstraction.h`](include/OsAbstraction.h) | C-facing portability layer (FreeRTOS today; ThreadX / Zephyr future) | Pass-through; safety follows underlying primitive | Inline typedefs only |
-| [`OsUtility.h`](include/OsUtility.h) | C helpers for delay / cycle counts / queue / event-group / timer / mutex / stream-buffer creation | Pass-through to RTOS handles | Most `*_create_*` allocate the underlying RTOS object once |
-| [`Utility.h`](include/Utility.h) | `WaitForCondition` template + small time helpers | Caller-supplied predicate dictates safety | None |
-| [`RtosMutex.h`](include/RtosMutex.h) | `std::lock_guard`-compatible mutex (used by handlers, managers, API) | Internal RTOS mutex; lock / try-lock / unlock | Allocates the handle on construction |
-| [`Mutex.h`](include/Mutex.h) | Named mutex wrapper used by `BaseThread` infrastructure | Internal RTOS mutex | Allocates the handle on construction |
-| [`MutexGuard.h`](include/MutexGuard.h) | RAII guard for `Mutex` with timeout | Locks/unlocks the wrapped mutex | None |
-| [`CriticalGuard.h`](include/CriticalGuard.h) | RAII helper for `portENTER_CRITICAL` / `portEXIT_CRITICAL` | Disables interrupts in scope | None |
-| [`SignalSemaphore.h`](include/SignalSemaphore.h) | Named binary semaphore for start/stop / wake events | Internal RTOS semaphore | Allocates the handle on construction |
-| [`OsQueue.h`](include/OsQueue.h) | `OsQueue<T, Capacity>` typed message queue | FreeRTOS queue is MT-safe; no extra mutex | Eager-construct in ctor; inline storage; no heap |
-| [`OsEventFlags.h`](include/OsEventFlags.h) | `OsEventFlags` event-group wrapper with `WaitMode::{Any, All}` | FreeRTOS event group is MT-safe; no extra mutex | Eager-construct in ctor |
-| [`PeriodicTimer.h`](include/PeriodicTimer.h) | RAII wrapper around FreeRTOS software timers | Backed by FreeRTOS timer service task | Allocates the handle on `Create()` |
-| [`FreeRTOSUtils.h`](include/FreeRTOSUtils.h) | Return-code → string + small debug helpers | Pure functions; no shared state | None |
-| [`BaseThread.h`](include/BaseThread.h) | Abstract worker thread (`Setup` / `Step` / `Cleanup`) with verified start / stop | Per-thread state; controlled via internal semaphores | Caller supplies the stack buffer; class never heap-allocates |
-| [`BaseThreadsManager.h`](include/BaseThreadsManager.h) | Optional registry that starts / stops a group of `BaseThread`s together | Internal mutex around the registry | Uses `std::map` (allocates per-registration) |
-| [`FlagsSaver.h`](include/FlagsSaver.h) | `hf::FlagsReader` / `FlagsWriter` ABCs + concrete `hf::FlagsSaver<FlagId, N>` two-state bitset | Lock-free reads & writes (atomic `uint64_t` words); waiter via event group | No heap; fixed `(N + 63) / 64` word array; event group lazy |
-| [`SeqlockSnapshot.h`](include/SeqlockSnapshot.h) | `hf::SnapshotReader` / `SnapshotWriter` ABCs + concrete `hf::SeqlockSnapshot<T>` coherent snapshot | Single-writer / many-reader seqlock | No heap; inline `T`; event group lazy |
-| [`ErrorHistory.h`](include/ErrorHistory.h) | `hf::ErrorHistoryReader` / `Writer` ABCs + concrete `hf::ErrorHistory<R, N>` ring buffer | All ops under internal `RtosMutex` | No heap; inline `Record[N]` |
-
----
-
-## Architecture at a glance
-
-The three Phase 2C generic templates all share the same shape — a pure-virtual
-**Reader** ABC, a pure-virtual **Writer** ABC, and a concrete **Saver** that
-derives from both. Hand a `Reader*` to subscribers that may only inspect, hand
-a `Writer*` to producers — the type system then enforces the apps ↔ middleware
-layering rules from `AGENTS.md`.
-
-![Reader / Writer / Saver architecture](docs/assets/generic-template-architecture.svg)
-
-`SeqlockSnapshot<T>` uses a classic single-writer / many-reader seqlock so that
-readers never block the writer and the writer never blocks readers:
-
-![Seqlock publish / read flow](docs/assets/seqlock-flow.svg)
-
----
-
-## Quick examples
-
-### `BaseThread`
-
+<!-- generated: quickstart-code -->
 ```cpp
 #include "BaseThread.h"
 
-class MotorTask : public BaseThread {
+class BlinkThread : public BaseThread {
 public:
-    MotorTask() : BaseThread("MotorTask") {}
-    bool     Setup()   override { return true; }
-    uint32_t Step()    override { /* control loop */ return 10; /* ms */ }
-    bool     Cleanup() override { return true; }
+    BlinkThread() : BaseThread("Blink") {}
+
+protected:
+    bool Initialize() noexcept override {             // creates the task once
+        return CreateBaseThread(stack_, sizeof(stack_), /*priority=*/5,
+                                /*preempt_threshold=*/5, /*timeSliceAllowed=*/0,
+                                OS_AUTO_START);
+    }
+    bool Setup() noexcept override { on_ = false; return true; }  // on a start
+    uint32_t Step() noexcept override {               // the loop body
+        on_ = !on_;                                    // toggle an LED here
+        return 500;                                    // ms until the next Step()
+    }
+    bool Cleanup() noexcept override { on_ = false; return true; }  // after a stop
+    bool ResetVariables() noexcept override { on_ = false; return true; }
+
+private:
+    bool on_ = false;
+    uint8_t stack_[4096];                              // no heap: the stack lives here
 };
 
-static MotorTask  worker;
-static uint8_t    stack[2048];
+static BlinkThread blink;
 
-void app_main() {
-    worker.CreateBaseThread(stack, sizeof(stack), /*priority=*/5, 0, 0, OS_AUTO_START);
-    worker.StartThreadAndWaitToVerify();
+bool StartBlink() {
+    if (!blink.EnsureInitialized()) {                  // Initialize(): create the task
+        return false;
+    }
+    return blink.StartThreadAndWaitToVerify(/*startTimeoutMsec=*/1000);
+}
+
+bool StopBlink() {
+    return blink.StopThreadAndWaitToVerify(/*stopTimeoutMsec=*/1000);
 }
 ```
+<!-- /generated -->
 
-### `OsQueue` (modernized — no `Send`-time mutex, no lazy init)
+## What it does
 
-```cpp
-#include "OsQueue.h"
+- `BaseThread`: a task that runs `Setup()`, `Step()` in a loop and `Cleanup()`, started and stopped with
+  verification.
+- `RtosMutex` (works with `std::lock_guard`), `Mutex` and `MutexGuard`, `SignalSemaphore`, `OsEventFlags`,
+  `CriticalGuard`.
+- `OsQueue<T, N>` and `PeriodicTimer`, with `uint32_t` millisecond timeouts (`UINT32_MAX` waits forever).
+- `hf::FlagsSaver`, `hf::SeqlockSnapshot`, `hf::ErrorHistory`: shared state with separate reader and writer
+  interfaces.
+- One compile definition picks the backend (`HF_RTOS_FREERTOS`, `HF_RTOS_THREADX`, `HF_RTOS_CMSIS`,
+  `HF_RTOS_NONE`); component code never names a kernel.
+- Host builds can take time from a fake clock (`HF_RTOS_NONE_EXTERNAL_CLOCK`), so timeouts expire in tests.
 
-OsQueue<int, /*Capacity=*/64> q{"Numbers"};
+## Install
 
-q.Send(42);                                 // blocks forever
-int v;
-if (q.Receive(v, /*timeout_ms=*/100)) {
-    // got value
-}
+```bash
+git submodule add https://github.com/hardfoc/hf-utils-rtos-wrap.git external/hf-utils-rtos-wrap
 ```
 
-### `OsEventFlags` (modernized — strongly-typed `WaitMode`)
-
-```cpp
-#include "OsEventFlags.h"
-
-OsEventFlags<> flags;
-flags.Set(0x3);
-
-uint32_t got = 0;
-if (flags.Wait(/*bits=*/0x3, WaitMode::All, /*timeout_ms=*/50, got)) {
-    // both bits arrived
-}
+```cmake
+target_include_directories(my_app PRIVATE external/hf-utils-rtos-wrap/include)
+target_sources(my_app PRIVATE external/hf-utils-rtos-wrap/src/RtosMutex.cpp)   # plus the list for your backend
+target_compile_definitions(my_app PUBLIC HF_RTOS_FREERTOS=1)
 ```
 
-### `hf::FlagsSaver` (Phase 2C)
-
-```cpp
-#include "FlagsSaver.h"
-
-enum class SystemFlag : uint8_t { kReady = 0, kFault, kCount };
-hf::FlagsSaver<SystemFlag, static_cast<size_t>(SystemFlag::kCount)> flags;
-
-// Producer (any task)
-flags.Set(SystemFlag::kReady, /*now_ms=*/os_get_tick_ms());
-
-// Consumer
-if (flags.IsSet(SystemFlag::kReady)) { /* … */ }
-flags.WaitForChange(/*timeout_ms=*/100);
-```
-
-### `hf::SeqlockSnapshot` (Phase 2C)
-
-```cpp
-#include "SeqlockSnapshot.h"
-
-struct ManifoldSnapshot { /* trivially copyable POD */ };
-hf::SeqlockSnapshot<ManifoldSnapshot> latest;
-
-// Single writer (aggregator thread)
-latest.Publish(snapshot);
-
-// Many readers (anywhere)
-ManifoldSnapshot out;
-auto seq = latest.Read(out);
-```
-
-### `hf::ErrorHistory` (Phase 2C)
-
-```cpp
-#include "ErrorHistory.h"
-
-struct ErrorRecord { uint32_t ts_ms; uint16_t code; char src[16]; };
-hf::ErrorHistory<ErrorRecord, /*Capacity=*/32> history;
-
-history.Push(ErrorRecord{ /* … */ });
-
-ErrorRecord buf[32];
-auto n = history.Snapshot(buf, 32);
-```
-
----
+Most projects get it through [hf-core](https://github.com/hardfoc/hf-core), which compiles the right sources for
+its `HF_CORE_RTOS` setting. The source list per backend is in
+[Integration](https://hardfoc.github.io/hf-utils-rtos-wrap/latest/integration/).
 
 ## Documentation
 
-Start at [`docs/index.md`](docs/index.md) for the full set of guides.
+| | |
+| --- | --- |
+| [Quickstart](https://hardfoc.github.io/hf-utils-rtos-wrap/latest/quickstart/) | A worker thread, start to finish |
+| [Architecture](https://hardfoc.github.io/hf-utils-rtos-wrap/latest/architecture/) | The layers, the rules, the memory model |
+| [Backends](https://hardfoc.github.io/hf-utils-rtos-wrap/latest/backends/) | Selecting a kernel, running without one, adding one |
+| [API guide](https://hardfoc.github.io/hf-utils-rtos-wrap/latest/api-guide/) | Which class for which job |
+| [Integration](https://hardfoc.github.io/hf-utils-rtos-wrap/latest/integration/) | Sources per backend, compile definitions |
+| [API reference](https://hardfoc.github.io/hf-utils-rtos-wrap/latest/api/) | Doxygen |
 
-| Topic | Doc |
-|---|---|
-| Threading | [`docs/BaseThread.md`](docs/BaseThread.md) |
-| Synchronization | [`docs/Synchronization.md`](docs/Synchronization.md) |
-| Queues | [`docs/Queues.md`](docs/Queues.md) |
-| Generic templates (FlagsSaver / SeqlockSnapshot / ErrorHistory) | [`docs/GenericTemplates.md`](docs/GenericTemplates.md) |
-| RTOS abstraction | [`docs/RTOSAbstraction.md`](docs/RTOSAbstraction.md) |
-| Periodic timers | [`docs/Timers.md`](docs/Timers.md) |
-| Misc utilities | [`docs/Utility.md`](docs/Utility.md) |
+## Tests
 
----
+```bash
+tools/docs/check-snippets.sh      # the documentation code against the headers; hf-core runs the host tests
+```
 
 ## License
 
-GNU GPL v3.0. See [`LICENSE`](LICENSE).
+GPL-3.0; see [LICENSE](LICENSE).
