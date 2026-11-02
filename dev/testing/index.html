@@ -1064,15 +1064,17 @@
 </table>
 <p>The repository has no build files of its own; the projects that include it compile it for their targets.</p>
 <h2 id="host-tests">Host tests<a class="headerlink" href="#host-tests" title="Permanent link">&para;</a></h2>
-<p><a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/6d59b84fc34ff391a346b6cde3a30df2de3b5626/tests/host/run.sh"><code>tests/host/run.sh</code></a> builds
-<a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/6d59b84fc34ff391a346b6cde3a30df2de3b5626/tests/host/test_freertos_backend.cpp"><code>tests/host/test_freertos_backend.cpp</code></a> with <code>HF_RTOS_FREERTOS</code>
-against <a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/6d59b84fc34ff391a346b6cde3a30df2de3b5626/tests/host/freertos-shim/FreeRTOS.h"><code>tests/host/freertos-shim/</code></a>: stand-in kernel headers with a
+<p><a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/93592fc4827bc38cbe2906da788d50d4be6e1a7a/tests/host/run.sh"><code>tests/host/run.sh</code></a> builds
+<a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/93592fc4827bc38cbe2906da788d50d4be6e1a7a/tests/host/test_freertos_backend.cpp"><code>tests/host/test_freertos_backend.cpp</code></a> with <code>HF_RTOS_FREERTOS</code>
+against <a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/93592fc4827bc38cbe2906da788d50d4be6e1a7a/tests/host/freertos-shim/FreeRTOS.h"><code>tests/host/freertos-shim/</code></a>: stand-in kernel headers with a
 100 Hz tick and static allocation, and a single-threaded model of queues and event groups that records the
-arguments it was given. A blocking call never blocks; it returns as if its timeout had passed. The tests cover
-<code>OsQueue</code> storage, capacity and item copies, <code>OsEventFlags::Wait()</code> results, and <code>WaitForChange()</code> on
-<code>FlagsSaver</code> and <code>SeqlockSnapshot</code>, including the millisecond-to-tick conversion.</p>
+arguments it was given. A blocking call never blocks; it returns as if its timeout had passed, and
+<code>vTaskDelay()</code> only records its ticks. The tests cover <code>OsQueue</code> storage, capacity and item copies,
+<code>OsEventFlags::Wait()</code> results, and <code>WaitForChange()</code> on <code>FlagsSaver</code> and <code>SeqlockSnapshot</code>, including the
+millisecond-to-tick conversion, and check that a short <code>os_delay_msec()</code> or timeout (1 ms at 100 Hz) waits one
+tick, not zero.</p>
 <p>The script then compiles every source file and public header with <code>HF_RTOS_CMSIS</code> against a declaration-only
-<a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/6d59b84fc34ff391a346b6cde3a30df2de3b5626/tests/host/cmsis/cmsis_os2.h"><code>cmsis_os2.h</code></a>, so the CMSIS-RTOS2 build cannot break unnoticed.</p>
+<a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/93592fc4827bc38cbe2906da788d50d4be6e1a7a/tests/host/cmsis/cmsis_os2.h"><code>cmsis_os2.h</code></a>, so the CMSIS-RTOS2 build cannot break unnoticed.</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>tests/host/run.sh<span class="w">                       </span><span class="c1"># CXX=g++ tests/host/run.sh for GCC</span>
 </span></code></pre></div>
 <h2 id="in-hf-core">In hf-core<a class="headerlink" href="#in-hf-core" title="Permanent link">&para;</a></h2>
@@ -1099,7 +1101,7 @@ tests against them with <code>HF_RTOS_NONE</code> and a fake clock:</p>
 <p>Run the host tests from an hf-core checkout as its <a href="https://github.com/hardfoc/hf-core/blob/main/docs/host-build.md">host build guide</a>
 describes.</p>
 <h2 id="documentation-code">Documentation code<a class="headerlink" href="#documentation-code" title="Permanent link">&para;</a></h2>
-<p>Every C++ block on this site is included from <a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/6d59b84fc34ff391a346b6cde3a30df2de3b5626/tests/docs/base_thread.cpp"><code>tests/docs/</code></a>. The docs
+<p>Every C++ block on this site is included from <a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/93592fc4827bc38cbe2906da788d50d4be6e1a7a/tests/docs/base_thread.cpp"><code>tests/docs/</code></a>. The docs
 workflow compiles each file before building the site, so a change to a header that breaks a page fails the pull
 request.</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>tools/docs/check-snippets.sh<span class="w">            </span><span class="c1"># CXX=g++ tools/docs/check-snippets.sh for GCC</span>

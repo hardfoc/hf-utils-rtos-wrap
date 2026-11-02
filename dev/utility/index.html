@@ -1184,7 +1184,17 @@ call it (see <a href="../backends/#time-without-a-scheduler">Backends</a>).</p>
 <tr>
 <td><code>os_delay_msec(ms)</code></td>
 <td><code>OsUtility.h</code></td>
-<td>Sleeps <code>ms</code> (a <code>uint16_t</code>, at most 65 535)</td>
+<td>Sleeps <code>ms</code> (a <code>uint16_t</code>, at most 65 535), converted with <code>os_convert_msec_to_delay_ticks()</code>: at least one tick for a non-zero <code>ms</code>, so 1 ms on a 100 Hz tick sleeps 10 ms, never 0</td>
+</tr>
+<tr>
+<td><code>os_convert_msec_to_delay_ticks(ms)</code></td>
+<td><code>OsUtility.h</code></td>
+<td>Ticks, rounded down, at least 1 for a non-zero <code>ms</code>; 0 for 0</td>
+</tr>
+<tr>
+<td><code>os_convert_hz_to_delay_ticks(hz)</code></td>
+<td><code>OsUtility.h</code></td>
+<td>Period in ticks, rounded down, at least 1 for a non-zero <code>hz</code>; 0 for 0</td>
 </tr>
 <tr>
 <td><code>os_delay_time(t, unit)</code></td>

@@ -924,13 +924,13 @@ committed figure no longer matches the code. Each figure below lists the files i
 <details class="hf-figure-desc">
 <summary>Figure description and sources</summary>
 <p>From top to bottom. Your code uses the C++ classes (listed from include/<em>.h). Every class calls the C portability layer, the OS_</em> types and os_* functions of OsAbstraction.h and OsUtility.h, and nothing else. That layer includes exactly one backend header from include/os/, chosen by a compile definition (read from the table in OsAbstraction.h); with no definition the no-RTOS backend is used, for host tests and bare metal. The backend is the only code that names a kernel.</p>
-<p>Drawn from: <a href="https://github.com/hardfoc/hf-utils-rtos-wrap/tree/6d59b84fc34ff391a346b6cde3a30df2de3b5626/include"><code>include</code></a> <code>classes</code>; <a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/6d59b84fc34ff391a346b6cde3a30df2de3b5626/include/OsAbstraction.h"><code>include/OsAbstraction.h</code></a> <code>backend table</code>; figure module <a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/6d59b84fc34ff391a346b6cde3a30df2de3b5626/docs/diagrams/figures/rtos-layers.py"><code>docs/diagrams/figures/rtos-layers.py</code></a>.</p>
+<p>Drawn from: <a href="https://github.com/hardfoc/hf-utils-rtos-wrap/tree/93592fc4827bc38cbe2906da788d50d4be6e1a7a/include"><code>include</code></a> <code>classes</code>; <a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/93592fc4827bc38cbe2906da788d50d4be6e1a7a/include/OsAbstraction.h"><code>include/OsAbstraction.h</code></a> <code>backend table</code>; figure module <a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/93592fc4827bc38cbe2906da788d50d4be6e1a7a/docs/diagrams/figures/rtos-layers.py"><code>docs/diagrams/figures/rtos-layers.py</code></a>.</p>
 </details>
-<p>Figure module: <a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/6d59b84fc34ff391a346b6cde3a30df2de3b5626/docs/diagrams/figures/rtos-layers.py"><code>docs/diagrams/figures/rtos-layers.py</code></a></p>
+<p>Figure module: <a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/93592fc4827bc38cbe2906da788d50d4be6e1a7a/docs/diagrams/figures/rtos-layers.py"><code>docs/diagrams/figures/rtos-layers.py</code></a></p>
 <p>Drawn from:</p>
 <ul>
-<li><code>classes</code> in <a href="https://github.com/hardfoc/hf-utils-rtos-wrap/tree/6d59b84fc34ff391a346b6cde3a30df2de3b5626/include"><code>include</code></a></li>
-<li><code>backend table</code> in <a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/6d59b84fc34ff391a346b6cde3a30df2de3b5626/include/OsAbstraction.h"><code>include/OsAbstraction.h</code></a></li>
+<li><code>classes</code> in <a href="https://github.com/hardfoc/hf-utils-rtos-wrap/tree/93592fc4827bc38cbe2906da788d50d4be6e1a7a/include"><code>include</code></a></li>
+<li><code>backend table</code> in <a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/93592fc4827bc38cbe2906da788d50d4be6e1a7a/include/OsAbstraction.h"><code>include/OsAbstraction.h</code></a></li>
 </ul>
 
 
