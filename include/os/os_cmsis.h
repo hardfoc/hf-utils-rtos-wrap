@@ -50,6 +50,7 @@ enum {
     OS_SUCCESS      = 0,
     OS_AND          = 1,
     OS_OR           = 2,
+    OS_EVENT_CLEAR  = 0x10, /**< OR into an event-group wait option: clear the awaited bits on success */
     OS_AUTO_START   = 1,
     OS_DONT_START   = 0,
     OS_INHERIT      = 0
@@ -279,6 +280,9 @@ static inline OS_Uint os_semaphore_info_get(OS_Semaphore *s, OS_Ulong *count)
     return OS_SUCCESS;
 }
 
+/** The kernel allocates CMSIS-RTOS2 queues; os_queue_create() needs no caller storage. */
+#define OS_QUEUE_STORE_BYTES(item_words, length) ((size_t)0)
+
 static inline OS_Uint os_queue_create(OS_Queue *q, const char *name, OS_Uint item_words,
                                       void * /*store*/, OS_Ulong length)
 {
@@ -326,7 +330,10 @@ static inline OS_Uint os_event_group_clear(OS_EventGroup *g, OS_Ulong flags)
 static inline OS_Uint os_event_group_get(OS_EventGroup *g, OS_Ulong flags, OS_Uint option,
                                          OS_Ulong *actual, OS_Ulong wait)
 {
-    const uint32_t opt = (option == OS_AND) ? osFlagsWaitAll : osFlagsWaitAny;
+    /* CMSIS clears the awaited flags unless told not to; clear only on OS_EVENT_CLEAR. */
+    const int all = ((option & ~(OS_Uint)OS_EVENT_CLEAR) == (OS_Uint)OS_AND);
+    const int clear = (option & (OS_Uint)OS_EVENT_CLEAR) != 0U;
+    const uint32_t opt = (all ? osFlagsWaitAll : osFlagsWaitAny) | (clear ? 0U : osFlagsNoClear);
     const uint32_t got = osEventFlagsWait(*g, (uint32_t)flags, opt, (uint32_t)wait);
     if (actual) {
         *actual = (OS_Ulong)got;

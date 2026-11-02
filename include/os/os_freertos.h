@@ -54,6 +54,7 @@
 #  include "stream_buffer.h"
 #endif
 
+#include <stddef.h>
 #include <stdint.h>
 
 /* ── SMP capability ───────────────────────────────────────────────────────
@@ -91,6 +92,7 @@ enum {
     OS_SUCCESS      = 0,
     OS_AND          = 1,
     OS_OR           = 2,
+    OS_EVENT_CLEAR  = 0x10, /**< OR into an event-group wait option: clear the awaited bits on success */
     OS_AUTO_START   = 1,
     OS_DONT_START   = 0,
     OS_INHERIT      = 0
@@ -275,13 +277,46 @@ static inline OS_Uint os_semaphore_info_get(OS_Semaphore *s, OS_Ulong *count)
     return OS_SUCCESS;
 }
 
-/* Queue wrappers ---------------------------------------------------------*/
+/* Queue wrappers ---------------------------------------------------------
+ * os_queue_create(q, name, item_words, store, length) creates a queue of
+ * @p length items of @p item_words 32-bit words each, as on every backend.
+ * @p store must hold OS_QUEUE_STORE_BYTES(item_words, length) bytes. With
+ * static allocation the kernel's StaticQueue_t is placed at the start of
+ * @p store and the items follow, so the queue never touches the kernel heap.
+ * Without configSUPPORT_STATIC_ALLOCATION the queue falls back to
+ * xQueueCreate() with the same item size and length, and @p store is unused. */
+#if defined(configSUPPORT_STATIC_ALLOCATION) && (configSUPPORT_STATIC_ALLOCATION == 1)
+#  define HF_OS_FREERTOS_STATIC_QUEUE 1
+/** Alignment of the control block inside the caller's queue storage. */
+#  define HF_OS_FREERTOS_QUEUE_ALIGN (2U * sizeof(void *))
+/** Bytes of storage os_queue_create() needs for @p length items of @p item_words words. */
+#  define OS_QUEUE_STORE_BYTES(item_words, length)                                  \
+    ((HF_OS_FREERTOS_QUEUE_ALIGN - 1U) + sizeof(StaticQueue_t) +                    \
+     (size_t)(item_words) * sizeof(uint32_t) * (size_t)(length))
+#else
+#  define HF_OS_FREERTOS_STATIC_QUEUE 0
+#  define OS_QUEUE_STORE_BYTES(item_words, length) ((size_t)0)
+#endif
+
 static inline OS_Uint os_queue_create(OS_Queue *q, const char* name, OS_Uint item_words,
                                       void* store, OS_Ulong length)
 {
     (void)name;
+    *q = NULL;
+    const size_t item_size = (size_t)item_words * sizeof(uint32_t);
+    if (item_size == 0U || length == 0U)
+        return 1;
+#if HF_OS_FREERTOS_STATIC_QUEUE
+    if (store == NULL)
+        return 1;
+    const uintptr_t align = (uintptr_t)HF_OS_FREERTOS_QUEUE_ALIGN;
+    const uintptr_t cb = ((uintptr_t)store + align - 1U) & ~(align - 1U);
+    *q = xQueueCreateStatic((UBaseType_t)length, (UBaseType_t)item_size,
+                            (uint8_t *)(cb + sizeof(StaticQueue_t)), (StaticQueue_t *)cb);
+#else
     (void)store;
-    *q = xQueueCreate(length, item_words * sizeof(uint32_t));
+    *q = xQueueCreate((UBaseType_t)length, (UBaseType_t)item_size);
+#endif
     return (*q) ? (OS_Uint)OS_SUCCESS : (OS_Uint)1;
 }
 static inline OS_Uint os_queue_delete(OS_Queue *q)    { vQueueDelete(*q); return OS_SUCCESS; }
@@ -300,14 +335,27 @@ static inline OS_Uint os_event_group_set(OS_EventGroup *g, OS_Ulong flags)
 { xEventGroupSetBits(*g, flags); return OS_SUCCESS; }
 static inline OS_Uint os_event_group_clear(OS_EventGroup *g, OS_Ulong flags)
 { xEventGroupClearBits(*g, flags); return OS_SUCCESS; }
+/**
+ * @brief Wait for event bits.
+ *
+ * @param option OS_AND (all of @p flags) or OS_OR (any of them), optionally
+ *               OR-ed with OS_EVENT_CLEAR to clear @p flags when the wait is
+ *               satisfied. Without OS_EVENT_CLEAR no bit is cleared.
+ * @return OS_SUCCESS when the condition was met; 1 on timeout. @p actual
+ *         receives the bits seen (before any clear) either way.
+ */
 static inline OS_Uint os_event_group_get(OS_EventGroup *g, OS_Ulong flags, OS_Uint option,
                                          OS_Ulong *actual, OS_Ulong wait)
 {
-    EventBits_t bits = xEventGroupWaitBits(*g, flags, option == OS_AND,
-                                           option == OS_AND, wait);
+    const int all = ((option & ~(OS_Uint)OS_EVENT_CLEAR) == (OS_Uint)OS_AND);
+    const int clear = (option & (OS_Uint)OS_EVENT_CLEAR) != 0U;
+    const EventBits_t want = (EventBits_t)flags;
+    const EventBits_t bits = xEventGroupWaitBits(*g, want, clear ? pdTRUE : pdFALSE,
+                                                 all ? pdTRUE : pdFALSE, (TickType_t)wait);
     if (actual)
         *actual = bits;
-    return OS_SUCCESS;
+    const int met = all ? ((bits & want) == want) : ((bits & want) != 0U);
+    return met ? (OS_Uint)OS_SUCCESS : (OS_Uint)1;
 }
 
 /* Timer wrappers ---------------------------------------------------------*/
