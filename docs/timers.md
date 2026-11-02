@@ -30,7 +30,7 @@ timer.
 - **One kernel timer per object**, created in `Create()`. The object itself holds a handle and a flag.
 - **The period is converted to ticks** with `os_convert_msec_to_delay_ticks()`, `ms * tick_rate / 1000`, rounded
   down: on a 100 Hz tick 25 ms becomes 2 ticks (20 ms) and anything under 10 ms becomes 0. Use whole ticks.
-  The multiplication is in 32 bits, so keep `ms * tick_rate` under 2^32 (about 4.29 million ms at 1 kHz).
+  The tick rate is `configTICK_RATE_HZ` on FreeRTOS.
 - **Callbacks share one task.** A slow callback delays every other timer in the system; hand longer work to a
   [BaseThread](base-thread.md) or a [queue](queues.md).
 

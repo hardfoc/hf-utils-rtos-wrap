@@ -60,11 +60,9 @@ buffer in the object, and the kernel semaphore is created on first use.
 An event group with a typed wait mode. `Wait()` blocks until the requested bits arrive (`WaitMode::Any` or
 `WaitMode::All`) or the timeout passes, and writes the bits it saw to its last argument.
 
-!!! warning "Check the bits as well as the result"
-    On the FreeRTOS backend `Wait()` currently returns true on a timeout too, because the backend's
-    `os_event_group_get()` always reports success. Compare the returned bits with the ones you asked for, as the
-    example does. With `WaitMode::All` FreeRTOS also clears the bits when the wait is satisfied; with
-    `WaitMode::Any` they stay set until you `Clear()` them.
+`Wait()` returns true only when the condition was met; on a timeout it returns false and the bits that had
+arrived are still written out. It never clears bits on any backend: call `Clear()` when you have handled them, as
+the example does.
 
 ```cpp
 --8<-- "tests/docs/sync.cpp:event-flags"

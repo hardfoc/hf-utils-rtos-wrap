@@ -17,10 +17,19 @@ the build with an error when more than one is defined.
 
 FreeRTOS is the backend in use today (ESP-IDF v5.5 on the ESP32-S3, FreeRTOS kernel 11.1).
 
-!!! note "CMSIS-RTOS2 provides the C layer only"
-    `OsUtility.h` declares the `os_*_ex` helpers that the C++ classes call for `HF_RTOS_FREERTOS` and
-    `HF_RTOS_THREADX` (and stubs them for `HF_RTOS_NONE`). Under `HF_RTOS_CMSIS` the `OS_*` types and `os_*`
-    functions of the backend are available; the classes are not yet.
+!!! note "CMSIS-RTOS2 tick rate"
+    CMSIS-RTOS2 reports its tick frequency only at run time, and the millisecond-to-tick conversion is
+    `constexpr`, so the backend assumes 1 kHz. Define `HF_RTOS_CMSIS_TICK_RATE_HZ` to your kernel's tick rate if
+    it differs. On FreeRTOS the conversion uses `configTICK_RATE_HZ`; on ThreadX it assumes 1 kHz.
+    `BaseThread::ChangePriority()` and `GetStackHighWaterMark()` are not implemented for CMSIS-RTOS2 and return
+    false and 0. CI compiles the CMSIS-RTOS2 build against a declaration-only `cmsis_os2.h`; it has not yet run on
+    a CMSIS kernel.
+
+## Event-flag waits
+
+`os_event_group_get()` returns `OS_SUCCESS` only when the wait condition was met (`OS_AND`: all bits, `OS_OR`:
+any of them) and an error on a timeout; the bits seen are written out either way. No backend clears bits unless
+the option includes `OS_EVENT_CLEAR`, which clears the awaited bits when the wait succeeds.
 
 ## Capabilities that always exist
 

@@ -28,15 +28,15 @@ Hand data from a producer task to a consumer task without a lock of your own. Va
 ## Memory and timing
 
 - **Construction is eager.** The kernel queue is created in the constructor; check `IsValid()` once at start-up.
-- **Items are copied in 32-bit words.** The item size passed to the kernel is `sizeof(T)` rounded up to a multiple
-  of 4 bytes.
-- **Send and receive are O(1)** plus the copy of one item. `Send()` copies the value to a local first.
-
-!!! warning "Use a `T` whose size is a multiple of 4 bytes on FreeRTOS"
-    The FreeRTOS backend creates the queue with `xQueueCreate()` on the kernel heap; the inline `storage_` array
-    is not used, and the queue length passed is `sizeof(storage_)` (bytes), not `N`. Because each item is rounded
-    up to whole words, the kernel copies more than `sizeof(T)` bytes into and out of a `T` whose size is not a
-    multiple of 4. Pad small types (wrap a `uint8_t` in a struct with a `uint32_t`) until the backend is fixed.
+- **The queue lives in the object.** On FreeRTOS the queue is created with `xQueueCreateStatic()` in the object's
+  inline storage (the kernel's `StaticQueue_t` followed by `N` items), so nothing comes from the kernel heap. On
+  ThreadX the items live there too. A FreeRTOS build without `configSUPPORT_STATIC_ALLOCATION` falls back to
+  `xQueueCreate()`, and CMSIS-RTOS2 allocates its queues in the kernel.
+- **It holds exactly `N` items.** `Send()` with `timeout_ms = 0` fails on the `N + 1`th item until one is received.
+- **Items are copied in 32-bit words.** The kernel stores `sizeof(T)` rounded up to a multiple of 4 bytes. `Send()`
+  and `Receive()` copy through a word buffer, so a `T` of any size is read and written only within its own bytes.
+- **Send and receive are O(1)** plus the copy of one item.
+- **`T` must be trivially copyable**, which a `static_assert` checks.
 
 On the no-RTOS backend `Send()` returns true and stores nothing, and `Receive()` returns false.
 
