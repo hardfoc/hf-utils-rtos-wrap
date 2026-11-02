@@ -1,0 +1,11 @@
+---
+# Site navigation (mkdocs-awesome-nav): the tabs and sidebar, in this order.
+nav:
+  - Home: index.md
+  - "BaseThread.md": BaseThread.md
+  - "GenericTemplates.md": GenericTemplates.md
+  - "Queues.md": Queues.md
+  - "RTOSAbstraction.md": RTOSAbstraction.md
+  - "Synchronization.md": Synchronization.md
+  - "Timers.md": Timers.md
+  - "Utility.md": Utility.md

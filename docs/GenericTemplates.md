@@ -1,6 +1,6 @@
 [⬅️ Previous](Queues.md) | [🗂️ Index](index.md) | [➡️ Next](RTOSAbstraction.md)
 
-# Generic Templates 🧬
+# Generic Templates
 
 `hf-utils-rtos-wrap` ships three thread-aware generic templates that capture
 the patterns the HardFOC codebase needs over and over: a flag bitset, a
@@ -17,7 +17,7 @@ layering rules described in [`AGENTS.md`](../../../../../../AGENTS.md).
 
 ![Reader / Writer / Saver architecture](assets/generic-template-architecture.svg)
 
-## 📜 Table of Contents
+## Table of Contents
 1. [`hf::FlagsSaver`](#hfflagssaverflagid-n)
 2. [`hf::SeqlockSnapshot`](#hfseqlocksnapshott)
 3. [`hf::ErrorHistory`](#hferrorhistoryrecord-n)

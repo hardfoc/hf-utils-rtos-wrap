@@ -1,11 +1,11 @@
 [🏠 Back to README](../README.md) | [➡️ Next](BaseThread.md)
 
-# hf-utils-rtos-wrap Documentation 📚
+# hf-utils-rtos-wrap Documentation
 
 Guides for the RTOS wrapper library. Each page links to the next so you can
 read straight through, or jump in via the table of contents below.
 
-## 📜 Table of Contents
+## Table of Contents
 1. [Threading with `BaseThread`](BaseThread.md)
 2. [Synchronization Primitives](Synchronization.md) — `RtosMutex`, `Mutex`, `MutexGuard`, `SignalSemaphore`, `OsEventFlags`, `CriticalGuard`
 3. [Message Queues](Queues.md) — `OsQueue<T, Capacity>`

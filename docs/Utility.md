@@ -1,6 +1,6 @@
 [⬅️ Previous](Timers.md) | [🗂️ Index](index.md) | [➡️ Next](index.md)
 
-# Utility Helpers 🧩
+# Utility Helpers
 
 A collection of small helpers that don't fit elsewhere.
 

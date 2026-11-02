@@ -1,6 +1,6 @@
 [⬅️ Previous](GenericTemplates.md) | [🗂️ Index](index.md) | [➡️ Next](Timers.md)
 
-# RTOS Abstraction Layer 🎛️
+# RTOS Abstraction Layer
 
 `OsAbstraction` and `OsUtility` hide the direct FreeRTOS types behind a minimal interface. This makes it easier to port the component to other RTOSes in the future.
 

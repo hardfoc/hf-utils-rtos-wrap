@@ -1,6 +1,6 @@
 [⬅️ Previous](Synchronization.md) | [🗂️ Index](index.md) | [➡️ Next](GenericTemplates.md)
 
-# Message Queues 📬
+# Message Queues
 
 `OsQueue<MessageType, Capacity>` is a typed, fixed-capacity queue backed by a
 FreeRTOS queue handle. The queue object is **eagerly constructed** in its

@@ -1,6 +1,6 @@
 [⬅️ Previous](RTOSAbstraction.md) | [🗂️ Index](index.md) | [➡️ Next](Utility.md)
 
-# Periodic Timers ⏲️
+# Periodic Timers
 
 `PeriodicTimer` provides a lightweight wrapper around ESP‑IDF timers. It lets you
 run a callback at a fixed interval without dealing with the FreeRTOS API

@@ -1,6 +1,6 @@
 [⬅️ Previous](BaseThread.md) | [🗂️ Index](index.md) | [➡️ Next](Queues.md)
 
-# Synchronization Primitives 🔒
+# Synchronization Primitives
 
 `hf-utils-rtos-wrap` provides a small set of synchronisation helpers. None of
 them perform lazy allocation: the underlying RTOS handle is created in the

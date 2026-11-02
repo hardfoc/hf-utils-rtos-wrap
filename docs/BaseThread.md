@@ -1,10 +1,10 @@
 [⬅️ Previous](index.md) | [🗂️ Index](index.md) | [➡️ Next](Synchronization.md)
 
-# BaseThread Class 🚦
+# BaseThread Class
 
 The `BaseThread` class provides a consistent interface for creating long-running worker threads in the HardFOC ecosystem. This document explains **why** you might use the class, its key methods, and shows real-world examples.
 
-## 📜 Table of Contents
+## Table of Contents
 1. [Why BaseThread? 🌟](#why-basethread-🌟)
 2. [Overview ✨](#overview-✨)
 3. [Typical Lifecycle 🚀](#typical-lifecycle-🚀)
@@ -14,13 +14,13 @@ The `BaseThread` class provides a consistent interface for creating long-running
 7. [Notes](#notes)
 8. [Conclusion 🎉](#conclusion-🎉)
 
-## Why BaseThread? 🌟
+## Why BaseThread?
 - **Cut boilerplate** – avoid writing repetitive FreeRTOS code every time you need a service thread.
 - **Predictable lifecycle** – the same setup, step and cleanup flow keeps your firmware organised.
 - **Portability** – the abstraction can be reused on different RTOS implementations with minimal effort.
 - **Safer start/stop** – helper calls verify that threads actually transition to the desired state.
 
-## Overview ✨
+## Overview
 `BaseThread` is an abstract C++ class that wraps a FreeRTOS task. It handles the boilerplate required to start, stop and synchronise threads. You derive from `BaseThread` and implement three virtual methods:
 - `Setup()` – executed once when the thread is first started.
 - `Step()` – called repeatedly while the thread is running. It returns a delay in milliseconds before the next call.
@@ -28,7 +28,7 @@ The `BaseThread` class provides a consistent interface for creating long-running
 
 Behind the scenes the class uses semaphores and FreeRTOS primitives defined in `OsAbstraction.h`.
 
-## Typical Lifecycle 🚀
+## Typical Lifecycle
 1. **Construction** – create your derived object with a thread name.
 2. **CreateBaseThread** – allocate the stack and specify priority plus other RTOS parameters.
 3. **Start()** – signals the thread to begin. Internally it runs `StartAction()` and then wakes the thread.
@@ -37,7 +37,7 @@ Behind the scenes the class uses semaphores and FreeRTOS primitives defined in `
 
 You can also use helper methods like `StartThreadAndWaitToVerify()` to block until the thread has actually started.
 
-## Quick Example 📝
+## Quick Example
 ```cpp
 class MyWorker : public BaseThread {
 public:
@@ -69,7 +69,7 @@ void app_main() {
 ```
 This example demonstrates creating a thread that repeats an action every 100 ms.
 
-## Usage Walkthrough 🎯
+## Usage Walkthrough
 1. **Allocate a stack** for your worker instance.
 2. **Call `CreateBaseThread()`** with stack size, priority and other runtime parameters.
 3. **Start the thread** using `StartThreadAndWaitToVerify()` (or `Start()`) when you are ready.
@@ -78,7 +78,7 @@ This example demonstrates creating a thread that repeats an action every 100 ms.
 
 The helper methods block until a state change is confirmed, giving you confidence that the thread is actually up or down.
 
-## Helpful Methods 🛠️
+## Helpful Methods
 - `Suspend()` / `Resume()` – pause or continue the underlying OS task.
 - `IsThreadRunning()` – check if the loop is currently active.
 - `ChangePriority(uint32_t newPriority)` – adjust runtime priority.
@@ -91,7 +91,7 @@ The helper methods block until a state change is confirmed, giving you confidenc
 - All methods are `noexcept` where possible to avoid unexpected exceptions in embedded environments.
 - Use `SignalSemaphore` internally for controlling start and stop events.
 
-## Conclusion 🎉
+## Conclusion
 `BaseThread` aims to simplify thread management in HardFOC-based applications. By deriving from it and implementing a few virtual methods, you gain a structured pattern for your worker threads while keeping your code portable across RTOS implementations.
 
 Happy coding! 😄
