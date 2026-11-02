@@ -1,0 +1,32 @@
+# Host tests: the FreeRTOS backend and the C++ wrappers on the kernel shim in tests/host/freertos-shim (ASan, UBSan),
+# and a compile check of every source and header for HF_RTOS_CMSIS. See docs/testing.md.
+name: Host tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: host-tests-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  host:
+    name: Host tests (${{ matrix.cxx }})
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        cxx: [g++, clang++]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+      - name: Run tests/host/run.sh
+        env:
+          CXX: ${{ matrix.cxx }}
+        run: sh tests/host/run.sh
