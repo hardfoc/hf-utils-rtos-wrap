@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 360" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13">
+  <title>SeqlockSnapshot — single writer, many reader algorithm</title>
+  <desc>Writer bumps seq odd, copies payload, bumps seq even. Reader snapshots seq, copies, re-reads seq, retries on torn read.</desc>
+
+  <defs>
+    <marker id="arr" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L9,3 L0,6 z" fill="#1e293b"/>
+    </marker>
+  </defs>
+
+  <text x="440" y="28" text-anchor="middle" font-size="17" font-weight="600" fill="#0f172a">SeqlockSnapshot&lt;T&gt; — coherent payload across the writer ↔ readers boundary</text>
+
+  <!-- Writer column -->
+  <rect x="40" y="60" width="320" height="270" rx="10" fill="#fef2f2" stroke="#dc2626" stroke-width="1.5"/>
+  <text x="200" y="84" text-anchor="middle" font-weight="700" fill="#7f1d1d">Publish(value)  — single writer</text>
+
+  <rect x="60" y="100" width="280" height="36" rx="4" fill="#ffffff" stroke="#dc2626"/>
+  <text x="200" y="123" text-anchor="middle" fill="#7f1d1d">① seq_.fetch_add(1)  →  odd</text>
+
+  <rect x="60" y="156" width="280" height="36" rx="4" fill="#ffffff" stroke="#dc2626"/>
+  <text x="200" y="179" text-anchor="middle" fill="#7f1d1d">② memcpy(payload_, value)</text>
+
+  <rect x="60" y="212" width="280" height="36" rx="4" fill="#ffffff" stroke="#dc2626"/>
+  <text x="200" y="235" text-anchor="middle" fill="#7f1d1d">③ atomic_thread_fence(release)</text>
+
+  <rect x="60" y="268" width="280" height="36" rx="4" fill="#ffffff" stroke="#dc2626"/>
+  <text x="200" y="291" text-anchor="middle" fill="#7f1d1d">④ seq_.fetch_add(1)  →  even</text>
+
+  <line x1="200" y1="136" x2="200" y2="156" stroke="#1e293b" stroke-width="1.4" marker-end="url(#arr)"/>
+  <line x1="200" y1="192" x2="200" y2="212" stroke="#1e293b" stroke-width="1.4" marker-end="url(#arr)"/>
+  <line x1="200" y1="248" x2="200" y2="268" stroke="#1e293b" stroke-width="1.4" marker-end="url(#arr)"/>
+
+  <!-- Reader column -->
+  <rect x="500" y="60" width="340" height="270" rx="10" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="670" y="84" text-anchor="middle" font-weight="700" fill="#1e3a8a">Read(out)  — many readers</text>
+
+  <rect x="520" y="100" width="300" height="36" rx="4" fill="#ffffff" stroke="#2563eb"/>
+  <text x="670" y="123" text-anchor="middle" fill="#1e3a8a">① s0 = seq_.load(acquire)</text>
+
+  <rect x="520" y="156" width="300" height="36" rx="4" fill="#ffffff" stroke="#2563eb"/>
+  <text x="670" y="179" text-anchor="middle" fill="#1e3a8a">② if (s0 odd) → spin / retry</text>
+
+  <rect x="520" y="212" width="300" height="36" rx="4" fill="#ffffff" stroke="#2563eb"/>
+  <text x="670" y="235" text-anchor="middle" fill="#1e3a8a">③ memcpy(out, payload_)</text>
+
+  <rect x="520" y="268" width="300" height="36" rx="4" fill="#ffffff" stroke="#2563eb"/>
+  <text x="670" y="291" text-anchor="middle" fill="#1e3a8a">④ s1 = seq_.load(acquire); if (s1 ≠ s0) retry</text>
+
+  <line x1="670" y1="136" x2="670" y2="156" stroke="#1e293b" stroke-width="1.4" marker-end="url(#arr)"/>
+  <line x1="670" y1="192" x2="670" y2="212" stroke="#1e293b" stroke-width="1.4" marker-end="url(#arr)"/>
+  <line x1="670" y1="248" x2="670" y2="268" stroke="#1e293b" stroke-width="1.4" marker-end="url(#arr)"/>
+
+  <!-- Shared state arrow -->
+  <line x1="360" y1="195" x2="500" y2="195" stroke="#475569" stroke-width="1.4" stroke-dasharray="4,3"/>
+  <text x="430" y="188" text-anchor="middle" fill="#475569" font-style="italic">shared seq_ + payload_</text>
+</svg>

@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="864" viewBox="0 0 1200 864" role="img" aria-labelledby="rtos-layers-title rtos-layers-desc" font-family="Inter, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif">
+<title id="rtos-layers-title">One API, one backend per scheduler</title>
+<desc id="rtos-layers-desc">Layer diagram: your code uses the C++ wrapper classes, which call the C portability layer of OsAbstraction.h and OsUtility.h, which includes one backend header chosen at build time: FreeRTOS, ThreadX, CMSIS-RTOS2, or the no-RTOS backend for host tests.</desc>
+<defs><marker id="fk-arrow-rail" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#6C7889"/></marker></defs>
+<rect x="0.5" y="0.5" width="1199" height="863" rx="16" fill="#0E131A" stroke="#283241"/>
+<text x="32" y="46.8" font-size="16" font-weight="700" letter-spacing="1.2" fill="#C7CBFF">ARCHITECTURE</text>
+<text x="32" y="85.6" font-size="32" font-weight="700" fill="#E8EDF3">One API, one backend per scheduler</text>
+<text x="32" y="115.4" font-size="18" fill="#9AA6B5">Classes never name a kernel. A compile definition picks the backend; with none, the host backend.</text>
+<rect x="32" y="131.4" width="1136" height="1" fill="#252F3C"/>
+<rect x="32" y="278.4" width="1136" height="191" rx="16" fill="#1C1F3D" stroke="#3B4080" stroke-width="1.2"/>
+<path d="M600 627.4 L600 635.4 Q600 643.4 592 643.4 L174.5 643.4 Q166.5 643.4 166.5 651.4 L166.5 659.4" fill="none" stroke="#6C7889" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#fk-arrow-rail)"/>
+<path d="M600 627.4 L600 635.4 Q600 643.4 592 643.4 L463.5 643.4 Q455.5 643.4 455.5 651.4 L455.5 659.4" fill="none" stroke="#6C7889" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#fk-arrow-rail)"/>
+<path d="M600 627.4 L600 635.4 Q600 643.4 608 643.4 L736.5 643.4 Q744.5 643.4 744.5 651.4 L744.5 659.4" fill="none" stroke="#6C7889" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#fk-arrow-rail)"/>
+<path d="M600 627.4 L600 635.4 Q600 643.4 608 643.4 L1025.5 643.4 Q1033.5 643.4 1033.5 651.4 L1033.5 659.4" fill="none" stroke="#6C7889" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#fk-arrow-rail)"/>
+<path d="M600 242.4 L600 274.4" fill="none" stroke="#6C7889" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#fk-arrow-rail)"/>
+<path d="M600 473.4 L600 505.4" fill="none" stroke="#6C7889" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#fk-arrow-rail)"/>
+<rect x="32" y="149.4" width="1136" height="89" rx="12" fill="#151C26" stroke="#3A4657" stroke-width="1"/>
+<rect x="32" y="157.4" width="4" height="73" rx="2" fill="#94A3B8"/>
+<rect x="32" y="509.4" width="1136" height="114" rx="12" fill="#1C1F3D" stroke="#8C93FF" stroke-width="1.4"/>
+<rect x="32" y="517.4" width="4" height="98" rx="2" fill="#8C93FF"/>
+<rect x="32" y="663.4" width="269" height="138" rx="12" fill="#0F2A28" stroke="#2DD4BF" stroke-width="1.4"/>
+<rect x="32" y="671.4" width="4" height="122" rx="2" fill="#2DD4BF"/>
+<rect x="321" y="663.4" width="269" height="138" rx="12" fill="#0F2A28" stroke="#2DD4BF" stroke-width="1.4"/>
+<rect x="321" y="671.4" width="4" height="122" rx="2" fill="#2DD4BF"/>
+<rect x="610" y="663.4" width="269" height="138" rx="12" fill="#0F2A28" stroke="#2DD4BF" stroke-width="1.4"/>
+<rect x="610" y="671.4" width="4" height="122" rx="2" fill="#2DD4BF"/>
+<rect x="899" y="663.4" width="269" height="138" rx="12" fill="#0F2A28" stroke="#2DD4BF" stroke-width="1.4"/>
+<rect x="899" y="671.4" width="4" height="122" rx="2" fill="#2DD4BF"/>
+<text x="56" y="184.4" font-size="20" font-weight="700" fill="#E8EDF3">Your code</text>
+<text x="56" y="215" font-size="17" fill="#D2DAE4">threads, handlers, managers, tests</text>
+<rect x="48" y="323.4" width="116.1" height="26" rx="13" fill="#1C1F3D" stroke="#3B4080" stroke-width="1"/>
+<text x="56" y="341.5" font-size="16" font-weight="700" fill="#C7CBFF">BaseThread</text>
+<rect x="172.1" y="323.4" width="199.4" height="26" rx="13" fill="#1C1F3D" stroke="#3B4080" stroke-width="1"/>
+<text x="180.1" y="341.5" font-size="16" font-weight="700" fill="#C7CBFF">BaseThreadsManager</text>
+<rect x="379.5" y="323.4" width="126" height="26" rx="13" fill="#1C1F3D" stroke="#3B4080" stroke-width="1"/>
+<text x="387.5" y="341.5" font-size="16" font-weight="700" fill="#C7CBFF">CriticalGuard</text>
+<rect x="513.5" y="323.4" width="176.7" height="26" rx="13" fill="#1C1F3D" stroke="#3B4080" stroke-width="1"/>
+<text x="521.5" y="341.5" font-size="16" font-weight="700" fill="#C7CBFF">ErrorHistoryReader</text>
+<rect x="698.2" y="323.4" width="170.2" height="26" rx="13" fill="#1C1F3D" stroke="#3B4080" stroke-width="1"/>
+<text x="706.2" y="341.5" font-size="16" font-weight="700" fill="#C7CBFF">ErrorHistoryWriter</text>
+<rect x="876.4" y="323.4" width="117.9" height="26" rx="13" fill="#1C1F3D" stroke="#3B4080" stroke-width="1"/>
+<text x="884.4" y="341.5" font-size="16" font-weight="700" fill="#C7CBFF">ErrorHistory</text>
+<rect x="1002.3" y="323.4" width="119.4" height="26" rx="13" fill="#1C1F3D" stroke="#3B4080" stroke-width="1"/>
+<text x="1010.3" y="341.5" font-size="16" font-weight="700" fill="#C7CBFF">FlagsReader</text>
+<rect x="48" y="357.4" width="112.9" height="26" rx="13" fill="#1C1F3D" stroke="#3B4080" stroke-width="1"/>
+<text x="56" y="375.5" font-size="16" font-weight="700" fill="#C7CBFF">FlagsWriter</text>
+<rect x="168.9" y="357.4" width="108.7" height="26" rx="13" fill="#1C1F3D" stroke="#3B4080" stroke-width="1"/>
+<text x="176.9" y="375.5" font-size="16" font-weight="700" fill="#C7CBFF">FlagsSaver</text>
+<rect x="285.7" y="357.4" width="68.5" height="26" rx="13" fill="#1C1F3D" stroke="#3B4080" stroke-width="1"/>
+<text x="293.7" y="375.5" font-size="16" font-weight="700" fill="#C7CBFF">Mutex</text>
+<rect x="362.2" y="357.4" width="119.2" height="26" rx="13" fill="#1C1F3D" stroke="#3B4080" stroke-width="1"/>
+<text x="370.2" y="375.5" font-size="16" font-weight="700" fill="#C7CBFF">MutexGuard</text>
+<rect x="489.4" y="357.4" width="130.5" height="26" rx="13" fill="#1C1F3D" stroke="#3B4080" stroke-width="1"/>
+<text x="497.4" y="375.5" font-size="16" font-weight="700" fill="#C7CBFF">OsEventFlags</text>
+<rect x="628" y="357.4" width="93.1" height="26" rx="13" fill="#1C1F3D" stroke="#3B4080" stroke-width="1"/>
+<text x="636" y="375.5" font-size="16" font-weight="700" fill="#C7CBFF">OsQueue</text>
+<rect x="729" y="357.4" width="132.7" height="26" rx="13" fill="#1C1F3D" stroke="#3B4080" stroke-width="1"/>
+<text x="737" y="375.5" font-size="16" font-weight="700" fill="#C7CBFF">PeriodicTimer</text>
+<rect x="869.7" y="357.4" width="94.7" height="26" rx="13" fill="#1C1F3D" stroke="#3B4080" stroke-width="1"/>
+<text x="877.7" y="375.5" font-size="16" font-weight="700" fill="#C7CBFF">RtosTime</text>
+<rect x="972.4" y="357.4" width="105.8" height="26" rx="13" fill="#1C1F3D" stroke="#3B4080" stroke-width="1"/>
+<text x="980.4" y="375.5" font-size="16" font-weight="700" fill="#C7CBFF">RtosMutex</text>
+<rect x="48" y="391.4" width="165" height="26" rx="13" fill="#1C1F3D" stroke="#3B4080" stroke-width="1"/>
+<text x="56" y="409.5" font-size="16" font-weight="700" fill="#C7CBFF">RtosSharedMutex</text>
+<rect x="221" y="391.4" width="152" height="26" rx="13" fill="#1C1F3D" stroke="#3B4080" stroke-width="1"/>
+<text x="229" y="409.5" font-size="16" font-weight="700" fill="#C7CBFF">RtosUniqueLock</text>
+<rect x="381" y="391.4" width="152.3" height="26" rx="13" fill="#1C1F3D" stroke="#3B4080" stroke-width="1"/>
+<text x="389" y="409.5" font-size="16" font-weight="700" fill="#C7CBFF">RtosSharedLock</text>
+<rect x="541.2" y="391.4" width="153.7" height="26" rx="13" fill="#1C1F3D" stroke="#3B4080" stroke-width="1"/>
+<text x="549.2" y="409.5" font-size="16" font-weight="700" fill="#C7CBFF">SnapshotReader</text>
+<rect x="702.9" y="391.4" width="147.2" height="26" rx="13" fill="#1C1F3D" stroke="#3B4080" stroke-width="1"/>
+<text x="710.9" y="409.5" font-size="16" font-weight="700" fill="#C7CBFF">SnapshotWriter</text>
+<rect x="858.1" y="391.4" width="161.6" height="26" rx="13" fill="#1C1F3D" stroke="#3B4080" stroke-width="1"/>
+<text x="866.1" y="409.5" font-size="16" font-weight="700" fill="#C7CBFF">SeqlockSnapshot</text>
+<rect x="48" y="425.4" width="162.6" height="26" rx="13" fill="#1C1F3D" stroke="#3B4080" stroke-width="1"/>
+<text x="56" y="443.5" font-size="16" font-weight="700" fill="#C7CBFF">SignalSemaphore</text>
+<text x="48" y="307.4" font-size="17" font-weight="700" fill="#C7CBFF">C++ WRAPPERS</text>
+<text x="204" y="307.4" font-size="16" fill="#C7CBFF">include/*.h</text>
+<text x="56" y="544.4" font-size="20" font-weight="700" fill="#C7CBFF">C portability layer</text>
+<text x="56" y="575" font-size="17" fill="#D2DAE4">OsAbstraction.h, OsUtility.h: OS_* types and os_* functions (threads, queues, mutexes,</text>
+<text x="56" y="599.7" font-size="17" fill="#D2DAE4">semaphores, event groups, timers, critical sections, time)</text>
+<text x="56" y="698.4" font-size="20" font-weight="700" fill="#A7F3E6">os_cmsis.h</text>
+<text x="56" y="729" font-size="17" fill="#D2DAE4">HF_RTOS_CMSIS</text>
+<text x="56" y="753.7" font-size="17" fill="#D2DAE4">CMSIS-RTOS2</text>
+<text x="56" y="778.3" font-size="17" fill="#D2DAE4">(osThreadNew, osDelay)</text>
+<text x="345" y="698.4" font-size="20" font-weight="700" fill="#A7F3E6">os_freertos.h</text>
+<text x="345" y="729" font-size="17" fill="#D2DAE4">HF_RTOS_FREERTOS</text>
+<text x="345" y="753.7" font-size="17" fill="#D2DAE4">FreeRTOS 11.1 (ESP-IDF</text>
+<text x="345" y="778.3" font-size="17" fill="#D2DAE4">SMP or vanilla)</text>
+<text x="634" y="698.4" font-size="20" font-weight="700" fill="#A7F3E6">os_threadx.h</text>
+<text x="634" y="729" font-size="17" fill="#D2DAE4">HF_RTOS_THREADX</text>
+<text x="634" y="753.7" font-size="17" fill="#D2DAE4">Azure RTOS ThreadX</text>
+<text x="923" y="698.4" font-size="20" font-weight="700" fill="#A7F3E6">os_none.h</text>
+<text x="923" y="729" font-size="17" fill="#D2DAE4">no definition</text>
+<text x="923" y="753.7" font-size="17" fill="#D2DAE4">no scheduler: host tests,</text>
+<text x="923" y="778.3" font-size="17" fill="#D2DAE4">bare metal</text>
+<rect x="32" y="813.8" width="14" height="14" rx="4" fill="#1C1F3D" stroke="#8C93FF" stroke-width="1.4"/>
+<text x="54" y="828.4" font-size="16" fill="#9AA6B5">this library</text>
+<rect x="161.8" y="813.8" width="14" height="14" rx="4" fill="#0F2A28" stroke="#2DD4BF" stroke-width="1.4"/>
+<text x="183.8" y="828.4" font-size="16" fill="#9AA6B5">one backend, chosen at build time</text>
+<rect x="483.1" y="813.8" width="14" height="14" rx="4" fill="#1B232E" stroke="#94A3B8" stroke-width="1.4"/>
+<text x="505.1" y="828.4" font-size="16" fill="#9AA6B5">yours</text>
+</svg>
