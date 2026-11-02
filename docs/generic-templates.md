@@ -36,10 +36,9 @@ the flag was already in that state, and bump a sequence counter. A waiter can bl
 | `Seq()`, `LastChangeMs()` | Reader | Change counter; the `now_ms` of the last change |
 | `WaitForChange(timeout)` / `ClearWaitEvent()` | Reader | Block until a change is signalled; discard a pending signal |
 
-!!! note "Re-arm the waiter"
-    On the FreeRTOS backend the change signal stays set after `WaitForChange()` returns, so call
-    `ClearWaitEvent()` before waiting again, as the example does. The timeout is passed to the kernel in ticks
-    without conversion; it is milliseconds at the 1 kHz tick HardFOC ESP32 builds use.
+`WaitForChange()` consumes the change signal when it returns true, so the next call waits for a new change.
+Call `ClearWaitEvent()` to forget changes made before you start waiting, as the example does at the top. The
+timeout is milliseconds, converted to kernel ticks like every other timeout in the library.
 
 The event group behind the waiter is created on the first `WaitForChange()` or `ClearWaitEvent()`.
 

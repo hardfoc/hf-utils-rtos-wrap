@@ -19,6 +19,7 @@
 #ifndef HF_UTILS_RTOS_WRAP_BASETHREADSMANAGER_H_
 #define HF_UTILS_RTOS_WRAP_BASETHREADSMANAGER_H_
 
+#include <algorithm>
 #include <map>
 #include <bitset>
 #include <functional>

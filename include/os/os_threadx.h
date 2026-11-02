@@ -16,6 +16,7 @@
  * @see os/README.md
  */
 
+#include <stddef.h>
 #include <stdint.h>
 #include "tx_api.h"
 
@@ -40,6 +41,7 @@ enum {
     OS_SUCCESS      = (int)TX_SUCCESS,
     OS_AND          = (int)TX_AND,
     OS_OR           = (int)TX_OR,
+    OS_EVENT_CLEAR  = 0x10, /**< OR into an event-group wait option: clear the awaited bits on success */
     OS_AUTO_START   = (int)TX_AUTO_START,
     OS_DONT_START   = (int)TX_DONT_START,
     OS_INHERIT      = (int)TX_INHERIT
@@ -188,6 +190,10 @@ static inline int os_thread_state_is_suspended(OS_Uint state)
            (state != (OS_Uint)TX_TERMINATED);
 }
 
+/** Bytes of storage os_queue_create() needs for @p length items of @p item_words words. */
+#define OS_QUEUE_STORE_BYTES(item_words, length) \
+    ((size_t)(item_words) * sizeof(ULONG) * (size_t)(length))
+
 static inline OS_Uint os_queue_create(OS_Queue *q, const char *name, OS_Uint item_words,
                                       void *store, OS_Ulong length)
 {
@@ -213,7 +219,10 @@ static inline OS_Uint os_event_group_get(OS_EventGroup *g, OS_Ulong flags, OS_Ui
                                          OS_Ulong *actual, OS_Ulong wait)
 {
     ULONG got = 0;
-    const UINT opt = (option == OS_AND) ? TX_AND : TX_OR;
+    /* TX_AND_CLEAR / TX_OR_CLEAR only with OS_EVENT_CLEAR; otherwise no bit is cleared. */
+    const int all = ((option & ~(OS_Uint)OS_EVENT_CLEAR) == (OS_Uint)OS_AND);
+    const int clear = (option & (OS_Uint)OS_EVENT_CLEAR) != 0U;
+    const UINT opt = all ? (clear ? TX_AND_CLEAR : TX_AND) : (clear ? TX_OR_CLEAR : TX_OR);
     const UINT err = tx_event_flags_get(g, (ULONG)flags, opt, &got, (ULONG)wait);
     if (actual) {
         *actual = (OS_Ulong)got;

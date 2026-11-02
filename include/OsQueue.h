@@ -5,9 +5,15 @@
  * Thread-safety: internally thread-safe; the underlying FreeRTOS queue is
  * already MT-safe so no extra mutex is layered on top.
  *
- * Allocation: queue storage is held inline as a fixed-capacity member array;
- * no heap allocation. The underlying RTOS queue handle is created eagerly in
- * the constructor.
+ * Allocation: queue storage is held inline as a member array sized by the
+ * backend's OS_QUEUE_STORE_BYTES(); on FreeRTOS (with static allocation) and
+ * ThreadX the kernel queue lives there and nothing is taken from the heap.
+ * CMSIS-RTOS2 allocates the queue in the kernel. The underlying RTOS queue is
+ * created eagerly in the constructor.
+ *
+ * Items travel through the kernel as whole 32-bit words: Send() and Receive()
+ * copy through a word buffer, so a `MessageType` whose size is not a multiple
+ * of 4 is never read or written past its end.
  *
  * Public surface uses modern C++ types — `uint32_t timeout_ms`, `bool`. No
  * `OS_Ulong` / `OS_WAIT_FOREVER` leakage. Pass `UINT32_MAX` to wait forever.
@@ -18,6 +24,8 @@
 #include <cstdint>
 #include <cstddef>
 #include <climits>
+#include <cstring>
+#include <type_traits>
 #include "OsAbstraction.h"
 #include "OsUtility.h"
 
@@ -31,6 +39,10 @@
  */
 template <typename MessageType, size_t kCapacity>
 class OsQueue {
+    static_assert(std::is_trivially_copyable_v<MessageType>,
+                  "OsQueue<T, N> requires a trivially copyable T");
+    static_assert(kCapacity > 0, "OsQueue<T, N> needs a capacity of at least 1");
+
 public:
     /**
      * @brief Construct and create the underlying RTOS queue eagerly.
@@ -38,10 +50,8 @@ public:
     explicit OsQueue(const char* queueName) noexcept
         : name_(queueName)
     {
-        constexpr OS_Uint kItemWords =
-            static_cast<OS_Uint>((sizeof(MessageType) + sizeof(uint32_t) - 1U) / sizeof(uint32_t));
-        created_ = os_queue_create_ex(queue_, name_, kItemWords,
-                                      storage_, sizeof(storage_));
+        created_ = os_queue_create_ex(queue_, name_, static_cast<OS_Uint>(kItemWords),
+                                      storage_, static_cast<OS_Ulong>(kCapacity));
     }
 
     OsQueue(const OsQueue&) = delete;
@@ -64,8 +74,9 @@ public:
     bool Send(const MessageType& message, uint32_t timeout_ms = UINT32_MAX) noexcept
     {
         if (!created_) return false;
-        MessageType local = message;
-        return os_queue_send_ex(queue_, &local, ToTicks(timeout_ms));
+        uint32_t item[kItemWords] = {};
+        std::memcpy(item, &message, sizeof(MessageType));
+        return os_queue_send_ex(queue_, item, ToTicks(timeout_ms));
     }
 
     /**
@@ -75,7 +86,10 @@ public:
     bool Receive(MessageType& out, uint32_t timeout_ms = UINT32_MAX) noexcept
     {
         if (!created_) return false;
-        return os_queue_receive_ex(queue_, &out, ToTicks(timeout_ms));
+        uint32_t item[kItemWords] = {};
+        if (!os_queue_receive_ex(queue_, item, ToTicks(timeout_ms))) return false;
+        std::memcpy(&out, item, sizeof(MessageType));
+        return true;
     }
 
     /**
@@ -84,6 +98,12 @@ public:
     [[nodiscard]] static constexpr size_t Capacity() noexcept { return kCapacity; }
 
 private:
+    /// Item size in 32-bit words, as the kernel queue stores it.
+    static constexpr size_t kItemWords = (sizeof(MessageType) + sizeof(uint32_t) - 1U) / sizeof(uint32_t);
+    /// Backing storage the backend asks for (at least one byte, so the array is never empty).
+    static constexpr size_t kStoreBytes =
+        (OS_QUEUE_STORE_BYTES(kItemWords, kCapacity) > 0U) ? OS_QUEUE_STORE_BYTES(kItemWords, kCapacity) : 1U;
+
     static OS_Ulong ToTicks(uint32_t timeout_ms) noexcept
     {
         return (timeout_ms == UINT32_MAX)
@@ -94,7 +114,7 @@ private:
     const char* name_;
     bool        created_{false};
     OS_Queue    queue_{};
-    MessageType storage_[kCapacity];
+    alignas(std::max_align_t) uint8_t storage_[kStoreBytes];
 };
 
 #endif /* OS_QUEUE_H_ */

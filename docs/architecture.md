@@ -39,7 +39,7 @@ Nothing here allocates on a hot path. Allocation happens once, where a kernel ob
 | Class | When the kernel object is created | Storage you own |
 | --- | --- | --- |
 | `BaseThread` | `CreateBaseThread()`, from your `Initialize()` | The stack buffer you pass |
-| `OsQueue<T, N>` | Constructor | Inline `T[N]` |
+| `OsQueue<T, N>` | Constructor | Inline: the kernel queue and `N` word-rounded items (FreeRTOS, ThreadX) |
 | `OsEventFlags`, `RtosMutex`, `Mutex`, `SignalSemaphore` | Constructor or first use | None |
 | `PeriodicTimer` | `Create()` | None |
 | `FlagsSaver`, `SeqlockSnapshot` | Event group on the first wait | Inline words or `T` |

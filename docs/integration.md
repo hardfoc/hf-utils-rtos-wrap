@@ -64,6 +64,24 @@ git submodule add https://github.com/hardfoc/hf-utils-rtos-wrap.git external/hf-
     target_link_libraries(hf_rtos_wrap PUBLIC threadx)   # your ThreadX target
     ```
 
+=== "CMSIS-RTOS2"
+
+    ```cmake
+    set(RTOS_WRAP ${CMAKE_CURRENT_LIST_DIR}/external/hf-utils-rtos-wrap)
+    add_library(hf_rtos_wrap STATIC
+        ${RTOS_WRAP}/src/BaseThread.cpp
+        ${RTOS_WRAP}/src/CriticalSection.cpp
+        ${RTOS_WRAP}/src/Mutex.cpp
+        ${RTOS_WRAP}/src/MutexGuard.cpp
+        ${RTOS_WRAP}/src/OsUtility.cpp
+        ${RTOS_WRAP}/src/PeriodicTimer.cpp
+        ${RTOS_WRAP}/src/RtosMutex.cpp
+        ${RTOS_WRAP}/src/SignalSemaphore.cpp)
+    target_include_directories(hf_rtos_wrap PUBLIC ${RTOS_WRAP}/include)
+    target_compile_definitions(hf_rtos_wrap PUBLIC HF_RTOS_CMSIS=1)
+    target_link_libraries(hf_rtos_wrap PUBLIC cmsis_rtos2)   # your CMSIS-RTOS2 kernel target
+    ```
+
 === "Host (no RTOS)"
 
     ```cmake
@@ -79,7 +97,7 @@ git submodule add https://github.com/hardfoc/hf-utils-rtos-wrap.git external/hf-
         HF_RTOS_NONE_EXTERNAL_CLOCK=1)   # optional: your harness provides the clock
     ```
 
-These are the source lists hf-core uses for each backend. Make the definitions `PUBLIC`: every file that includes
+These are the source lists for each backend; hf-core uses the FreeRTOS, ThreadX and host ones. Make the definitions `PUBLIC`: every file that includes
 the headers must see the same backend.
 
 ## Compile definitions
@@ -88,7 +106,8 @@ the headers must see the same backend.
 | --- | --- | --- |
 | `HF_RTOS_FREERTOS` | You | FreeRTOS backend |
 | `HF_RTOS_THREADX` | You | ThreadX backend |
-| `HF_RTOS_CMSIS` | You | CMSIS-RTOS2 backend (C layer only) |
+| `HF_RTOS_CMSIS` | You | CMSIS-RTOS2 backend |
+| `HF_RTOS_CMSIS_TICK_RATE_HZ` | You, with `HF_RTOS_CMSIS` | Kernel tick rate for millisecond conversions; default 1000 |
 | `HF_RTOS_NONE` | You | No-RTOS backend: stubs for host tests and bare metal |
 | `HF_RTOS_NONE_EXTERNAL_CLOCK` | You, with `HF_RTOS_NONE` | Time and delays come from `hf_os_none_clock_us()` / `hf_os_none_delay_us()` |
 | `HF_MCU_FAMILY_NONE` | hf-core's host build | Same stubs as `HF_RTOS_NONE` in `OsUtility.h` |

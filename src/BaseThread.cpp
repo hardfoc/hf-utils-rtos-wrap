@@ -49,7 +49,7 @@ BaseThread::BaseThread( const char* threadName) :
   * but will  support unit testing
   * @return n/a
   */
-BaseThread::~BaseThread()
+BaseThread::~BaseThread() noexcept
 {
 	if( osThreadCreated )
 	{

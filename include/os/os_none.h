@@ -40,6 +40,7 @@ enum {
     OS_SUCCESS      = 0,
     OS_AND          = 1,
     OS_OR           = 2,
+    OS_EVENT_CLEAR  = 0x10, /**< OR into an event-group wait option: clear the awaited bits on success */
     OS_AUTO_START   = 1,
     OS_DONT_START   = 0,
     OS_INHERIT      = 0
@@ -153,6 +154,7 @@ static inline OS_Uint os_semaphore_info_get(OS_Semaphore *s, OS_Ulong *count)
 { (void)s; if (count) *count = 0; return OS_SUCCESS; }
 
 /* Queue — creation succeeds; a receive has nothing to hand back */
+#define OS_QUEUE_STORE_BYTES(item_words, length) ((size_t)0)
 static inline OS_Uint os_queue_create(OS_Queue *q, const char *name, OS_Uint item_words,
                                       void *store, OS_Ulong length)
 { (void)q; (void)name; (void)item_words; (void)store; (void)length; return OS_SUCCESS; }
