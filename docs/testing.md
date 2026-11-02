@@ -18,9 +18,11 @@ The repository has no build files of its own; the projects that include it compi
 [`tests/host/test_freertos_backend.cpp`](../tests/host/test_freertos_backend.cpp) with `HF_RTOS_FREERTOS`
 against [`tests/host/freertos-shim/`](../tests/host/freertos-shim/FreeRTOS.h): stand-in kernel headers with a
 100 Hz tick and static allocation, and a single-threaded model of queues and event groups that records the
-arguments it was given. A blocking call never blocks; it returns as if its timeout had passed. The tests cover
-`OsQueue` storage, capacity and item copies, `OsEventFlags::Wait()` results, and `WaitForChange()` on
-`FlagsSaver` and `SeqlockSnapshot`, including the millisecond-to-tick conversion.
+arguments it was given. A blocking call never blocks; it returns as if its timeout had passed, and
+`vTaskDelay()` only records its ticks. The tests cover `OsQueue` storage, capacity and item copies,
+`OsEventFlags::Wait()` results, and `WaitForChange()` on `FlagsSaver` and `SeqlockSnapshot`, including the
+millisecond-to-tick conversion, and check that a short `os_delay_msec()` or timeout (1 ms at 100 Hz) waits one
+tick, not zero.
 
 The script then compiles every source file and public header with `HF_RTOS_CMSIS` against a declaration-only
 [`cmsis_os2.h`](../tests/host/cmsis/cmsis_os2.h), so the CMSIS-RTOS2 build cannot break unnoticed.

@@ -24,7 +24,9 @@ call it (see [Backends](backends.md#time-without-a-scheduler)).
 | `RtosTime::GetCurrentTimeUs()` | `RtosMutex.h` | Microseconds since start, from the kernel tick (tick resolution) or the external clock |
 | `RtosTime::MsToTicks(ms)` | `RtosMutex.h` | Ticks, at least 1 for a non-zero `ms` |
 | `os_get_elapsed_time_msec()` | `OsUtility.h` | Milliseconds since start, as `uint32_t` (wraps after 49.7 days) |
-| `os_delay_msec(ms)` | `OsUtility.h` | Sleeps `ms` (a `uint16_t`, at most 65 535) |
+| `os_delay_msec(ms)` | `OsUtility.h` | Sleeps `ms` (a `uint16_t`, at most 65 535), converted with `os_convert_msec_to_delay_ticks()`: at least one tick for a non-zero `ms`, so 1 ms on a 100 Hz tick sleeps 10 ms, never 0 |
+| `os_convert_msec_to_delay_ticks(ms)` | `OsUtility.h` | Ticks, rounded down, at least 1 for a non-zero `ms`; 0 for 0 |
+| `os_convert_hz_to_delay_ticks(hz)` | `OsUtility.h` | Period in ticks, rounded down, at least 1 for a non-zero `hz`; 0 for 0 |
 | `os_delay_time(t, unit)` | `OsUtility.h` | Sleeps `t` in `TIME_UNIT_US`, `TIME_UNIT_MS` or `TIME_UNIT_S` |
 
 ```cpp

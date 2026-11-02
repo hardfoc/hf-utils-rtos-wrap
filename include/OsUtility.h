@@ -63,15 +63,20 @@ static constexpr uint32_t osTickRateHz = 1000;
 
 // ── Portable constexpr conversion utilities (work regardless of RTOS) ────
 /**
- * @brief Converts milliseconds to delay ticks, rounding down.
+ * @brief Converts milliseconds to delay ticks, rounding down but never to zero.
  *
- * Computed in 64 bits; a result that does not fit is clamped below
- * UINT32_MAX, so a long timeout never turns into a wait-forever.
+ * A non-zero @p milliseconds gives at least one tick, so a short delay or
+ * timeout on a slow tick (1 ms at 100 Hz) waits one tick instead of none;
+ * 0 ms stays 0 ticks (no wait). Computed in 64 bits; a result that does not
+ * fit is clamped below UINT32_MAX, so a long timeout never turns into a
+ * wait-forever.
  */
 constexpr uint32_t os_convert_msec_to_delay_ticks( uint32_t milliseconds )
 {
 	const uint64_t ticks = static_cast<uint64_t>(milliseconds) * osTickRateHz / 1000U;
-	return (ticks >= 0xFFFFFFFFULL) ? 0xFFFFFFFEU : static_cast<uint32_t>(ticks);
+	if (ticks >= 0xFFFFFFFFULL) return 0xFFFFFFFEU;
+	if (ticks == 0U && milliseconds != 0U) return 1U;
+	return static_cast<uint32_t>(ticks);
 }
 
 /**
@@ -83,11 +88,16 @@ constexpr uint32_t os_convert_delay_ticks_to_msec(uint32_t delayTicks)
 }
 
 /**
- * @brief Converts frequency to delay ticks.
+ * @brief Converts a frequency to a period in delay ticks, rounding down but never to zero.
+ *
+ * A frequency above the tick rate gives one tick (the fastest the kernel can
+ * run); 0 Hz gives 0.
  */
 constexpr uint32_t os_convert_hz_to_delay_ticks( uint32_t frequency )
 {
-	return osTickRateHz/frequency;
+	if (frequency == 0U) return 0U;
+	const uint32_t ticks = osTickRateHz / frequency;
+	return (ticks == 0U) ? 1U : ticks;
 }
 
 // ── RTOS declarations (implemented in OsUtility.cpp) ─────────────────────
@@ -500,7 +510,9 @@ constexpr uint32_t os_convert_delay_ticks_to_msec(uint32_t delayTicks)
 
 constexpr uint32_t os_convert_hz_to_delay_ticks(uint32_t frequency)
 {
-  return (frequency == 0U) ? 0U : (osTickRateHz / frequency);
+  if (frequency == 0U) return 0U;
+  const uint32_t ticks = osTickRateHz / frequency;
+  return (ticks == 0U) ? 1U : ticks;
 }
 #endif
 

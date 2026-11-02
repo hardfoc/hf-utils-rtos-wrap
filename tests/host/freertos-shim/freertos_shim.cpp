@@ -107,12 +107,17 @@ EventBits_t xEventGroupWaitBits(EventGroupHandle_t g, EventBits_t bits, BaseType
     return seen;  // on a timeout the kernel also returns the current bits
 }
 
+/* Records the requested sleep; time does not advance. */
+void vTaskDelay(TickType_t ticks) {
+    ++shim::State().delay_calls;
+    shim::State().last_delay = ticks;
+}
+
 /* Declared so the backend compiles; not modelled. */
 BaseType_t xTaskCreate(TaskFunction_t, const char*, uint32_t, void*, UBaseType_t, TaskHandle_t*) { return pdFAIL; }
 void vTaskSuspend(TaskHandle_t) {}
 void vTaskResume(TaskHandle_t) {}
 void vTaskDelete(TaskHandle_t) {}
-void vTaskDelay(TickType_t) {}
 eTaskState eTaskGetState(TaskHandle_t) { return eInvalid; }
 BaseType_t xTaskGetSchedulerState(void) { return taskSCHEDULER_NOT_STARTED; }
 TaskHandle_t xTaskGetCurrentTaskHandle(void) { return nullptr; }
