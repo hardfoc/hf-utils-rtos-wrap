@@ -5,6 +5,13 @@ reached `main`.
 
 ## Unreleased
 
+- `os_convert_msec_to_delay_ticks()` returns at least one tick for a non-zero millisecond value (it still rounds
+  down otherwise, and 0 ms is still 0 ticks), on every backend. So `os_delay_msec()` and every timeout that goes
+  through it (`OsQueue`, `OsEventFlags`, `FlagsSaver`, `SeqlockSnapshot`, `Mutex`, `MutexGuard`, `PeriodicTimer`)
+  never turns a 1 ms delay into a zero-tick wait on a slow tick: at 100 Hz, 1 to 19 ms is one tick.
+  `os_convert_hz_to_delay_ticks()` likewise gives at least one tick for a frequency above the tick rate, and 0 for
+  0 Hz instead of dividing by zero.
+  Host tests check both at the shim's 100 Hz tick.
 - Documentation moved to the HardFOC MkDocs site, with the code on the pages compiled in CI.
 - FreeRTOS: `OsQueue` creates its queue with `xQueueCreateStatic()` in the object's inline storage, with `N` items
   of `sizeof(T)` rounded up to words. It used `xQueueCreate()` on the kernel heap with the storage size in bytes as
