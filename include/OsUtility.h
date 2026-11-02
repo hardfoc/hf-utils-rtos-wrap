@@ -39,16 +39,39 @@ enum time_unit_t {
 
 #define UTIL_SYSTEM_CLOCK (240000000.0)	//240MHz
 
-#if defined(HF_RTOS_FREERTOS) || defined(HF_RTOS_THREADX)
+#if defined(HF_RTOS_FREERTOS) || defined(HF_RTOS_THREADX) || defined(HF_RTOS_CMSIS)
+
+#if defined(HF_RTOS_CMSIS) && !defined(HF_RTOS_CMSIS_TICK_RATE_HZ)
+/**
+ * @brief Kernel tick rate for the CMSIS-RTOS2 backend.
+ *
+ * CMSIS-RTOS2 reports its tick rate only at run time (`osKernelGetTickFreq()`),
+ * and the millisecond conversions below are constexpr. Define this to the
+ * kernel's tick frequency when it is not 1 kHz.
+ */
+#  define HF_RTOS_CMSIS_TICK_RATE_HZ 1000U
+#endif
+
+/** Kernel tick rate used by the millisecond/tick conversions. */
+#if defined(HF_RTOS_FREERTOS)
+static constexpr uint32_t osTickRateHz = static_cast<uint32_t>(configTICK_RATE_HZ);
+#elif defined(HF_RTOS_CMSIS)
+static constexpr uint32_t osTickRateHz = HF_RTOS_CMSIS_TICK_RATE_HZ;
+#else
 static constexpr uint32_t osTickRateHz = 1000;
+#endif
 
 // ── Portable constexpr conversion utilities (work regardless of RTOS) ────
 /**
- * @brief Converts milliseconds to delay ticks.
+ * @brief Converts milliseconds to delay ticks, rounding down.
+ *
+ * Computed in 64 bits; a result that does not fit is clamped below
+ * UINT32_MAX, so a long timeout never turns into a wait-forever.
  */
 constexpr uint32_t os_convert_msec_to_delay_ticks( uint32_t milliseconds )
 {
-	return milliseconds * osTickRateHz / 1000U;
+	const uint64_t ticks = static_cast<uint64_t>(milliseconds) * osTickRateHz / 1000U;
+	return (ticks >= 0xFFFFFFFFULL) ? 0xFFFFFFFEU : static_cast<uint32_t>(ticks);
 }
 
 /**
@@ -452,7 +475,7 @@ bool os_event_flags_get_ex(OS_EventGroup& eventFlags, OS_Ulong flagsToGet,
 }
 #endif
 
-#endif /* HF_RTOS_FREERTOS || HF_RTOS_THREADX */
+#endif /* HF_RTOS_FREERTOS || HF_RTOS_THREADX || HF_RTOS_CMSIS */
 
 /* ═══════════════════════════════════════════════════════════════════════════
  * RTOS_NONE  — inline no-op stubs for _ex functions (OsUtility.cpp not compiled)

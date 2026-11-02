@@ -8,6 +8,7 @@
  * @todo Add @copyright line once project copyright wording is finalised.
   */
 #include <cmath>
+#include <type_traits>
 #include "OsAbstraction.h"
 #include "OsUtility.h"
 #if defined(HF_RTOS_FREERTOS)
@@ -589,6 +590,29 @@ bool os_queue_receive_ex(OS_Queue& queue, void* message, OS_Ulong wait_option, [
 // TIMER
 //============================================================================================//
 
+namespace {
+
+/**
+ * The backends take a void (*)(OS_Ulong) callback, which is the same type as
+ * void (*)(uint32_t) on the 32-bit targets. Where it is not (a 64-bit host
+ * build of a kernel backend) creating a timer fails rather than calling the
+ * callback through the wrong type.
+ */
+template <typename Callback>
+OS_Uint CreateTimer(OS_Timer& timer, char* name, Callback callback, uint32_t id,
+                    uint32_t initialTicks, uint32_t rescheduleTicks, OS_Uint autoActivate) noexcept
+{
+	if constexpr (std::is_same_v<Callback, void (*)(OS_Ulong)>) {
+		return os_timer_create(&timer, name, callback, id, initialTicks, rescheduleTicks, autoActivate);
+	} else {
+		(void)timer; (void)name; (void)callback; (void)id;
+		(void)initialTicks; (void)rescheduleTicks; (void)autoActivate;
+		return 1;
+	}
+}
+
+}  // namespace
+
 /**
   * @brief Function to create a OS timer and report errors associated with the creation
   *
@@ -607,8 +631,8 @@ bool os_timer_create_ex ( OS_Timer& timer, const char* name, void (*callback)(ui
 {
 	if( name != nullptr )
 	{
-		auto status = os_timer_create(&timer, const_cast<char*>(name), callback, callbackExpirationInput, initialTimeoutTicks,
-				rescheduleTimeoutTicks, autoActivate);
+		auto status = CreateTimer(timer, const_cast<char*>(name), callback, callbackExpirationInput,
+				initialTimeoutTicks, rescheduleTimeoutTicks, autoActivate);
 		if (status == OS_SUCCESS)
 		{
 			return true;
