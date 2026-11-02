@@ -1082,6 +1082,19 @@ reached <code>main</code>.</p>
 <h2 id="unreleased">Unreleased<a class="headerlink" href="#unreleased" title="Permanent link">&para;</a></h2>
 <ul>
 <li>Documentation moved to the HardFOC MkDocs site, with the code on the pages compiled in CI.</li>
+<li>FreeRTOS: <code>OsQueue</code> creates its queue with <code>xQueueCreateStatic()</code> in the object's inline storage, with <code>N</code> items
+  of <code>sizeof(T)</code> rounded up to words. It used <code>xQueueCreate()</code> on the kernel heap with the storage size in bytes as
+  the length. Items are copied through a word buffer, so a <code>T</code> whose size is not a multiple of 4 is no longer read
+  or written past its end on any backend. On ThreadX the queue storage is now sized for <code>N</code> items.</li>
+<li><code>os_event_group_get()</code> returns success only when the wait condition was met, so <code>OsEventFlags::Wait()</code> returns
+  false on a timeout (FreeRTOS always reported success). No backend clears bits unless the new <code>OS_EVENT_CLEAR</code>
+  option is given: FreeRTOS no longer clears them on an <code>OS_AND</code> wait, and CMSIS-RTOS2 no longer clears them on
+  every wait.</li>
+<li><code>FlagsSaver::WaitForChange()</code> and <code>SeqlockSnapshot::WaitForChange()</code> consume the change signal and convert the
+  timeout from milliseconds to ticks.</li>
+<li>FreeRTOS: millisecond conversions use <code>configTICK_RATE_HZ</code> instead of assuming 1 kHz, in 64-bit arithmetic.</li>
+<li>The C++ classes build with <code>HF_RTOS_CMSIS</code> (<code>HF_RTOS_CMSIS_TICK_RATE_HZ</code> sets the tick rate, default 1000).</li>
+<li>Host tests: the FreeRTOS backend on a kernel shim, and a CMSIS-RTOS2 compile check (<code>tests/host/run.sh</code>).</li>
 </ul>
 <h2 id="2026-11-01">2026-11-01<a class="headerlink" href="#2026-11-01" title="Permanent link">&para;</a></h2>
 <ul>

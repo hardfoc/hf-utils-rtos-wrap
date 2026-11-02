@@ -1204,17 +1204,16 @@
 <h2 id="memory-and-timing">Memory and timing<a class="headerlink" href="#memory-and-timing" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong>Construction is eager.</strong> The kernel queue is created in the constructor; check <code>IsValid()</code> once at start-up.</li>
-<li><strong>Items are copied in 32-bit words.</strong> The item size passed to the kernel is <code>sizeof(T)</code> rounded up to a multiple
-  of 4 bytes.</li>
-<li><strong>Send and receive are O(1)</strong> plus the copy of one item. <code>Send()</code> copies the value to a local first.</li>
+<li><strong>The queue lives in the object.</strong> On FreeRTOS the queue is created with <code>xQueueCreateStatic()</code> in the object's
+  inline storage (the kernel's <code>StaticQueue_t</code> followed by <code>N</code> items), so nothing comes from the kernel heap. On
+  ThreadX the items live there too. A FreeRTOS build without <code>configSUPPORT_STATIC_ALLOCATION</code> falls back to
+  <code>xQueueCreate()</code>, and CMSIS-RTOS2 allocates its queues in the kernel.</li>
+<li><strong>It holds exactly <code>N</code> items.</strong> <code>Send()</code> with <code>timeout_ms = 0</code> fails on the <code>N + 1</code>th item until one is received.</li>
+<li><strong>Items are copied in 32-bit words.</strong> The kernel stores <code>sizeof(T)</code> rounded up to a multiple of 4 bytes. <code>Send()</code>
+  and <code>Receive()</code> copy through a word buffer, so a <code>T</code> of any size is read and written only within its own bytes.</li>
+<li><strong>Send and receive are O(1)</strong> plus the copy of one item.</li>
+<li><strong><code>T</code> must be trivially copyable</strong>, which a <code>static_assert</code> checks.</li>
 </ul>
-<div class="admonition warning">
-<p class="admonition-title">Use a <code>T</code> whose size is a multiple of 4 bytes on FreeRTOS</p>
-<p>The FreeRTOS backend creates the queue with <code>xQueueCreate()</code> on the kernel heap; the inline <code>storage_</code> array
-is not used, and the queue length passed is <code>sizeof(storage_)</code> (bytes), not <code>N</code>. Because each item is rounded
-up to whole words, the kernel copies more than <code>sizeof(T)</code> bytes into and out of a <code>T</code> whose size is not a
-multiple of 4. Pad small types (wrap a <code>uint8_t</code> in a struct with a <code>uint32_t</code>) until the backend is fixed.</p>
-</div>
 <p>On the no-RTOS backend <code>Send()</code> returns true and stores nothing, and <code>Receive()</code> returns false.</p>
 <p>Next: <a href="../timers/">Timers</a>.</p>
 

@@ -1198,7 +1198,7 @@ timer.</p>
 <li><strong>One kernel timer per object</strong>, created in <code>Create()</code>. The object itself holds a handle and a flag.</li>
 <li><strong>The period is converted to ticks</strong> with <code>os_convert_msec_to_delay_ticks()</code>, <code>ms * tick_rate / 1000</code>, rounded
   down: on a 100 Hz tick 25 ms becomes 2 ticks (20 ms) and anything under 10 ms becomes 0. Use whole ticks.
-  The multiplication is in 32 bits, so keep <code>ms * tick_rate</code> under 2^32 (about 4.29 million ms at 1 kHz).</li>
+  The tick rate is <code>configTICK_RATE_HZ</code> on FreeRTOS.</li>
 <li><strong>Callbacks share one task.</strong> A slow callback delays every other timer in the system; hand longer work to a
   <a href="../base-thread/">BaseThread</a> or a <a href="../queues/">queue</a>.</li>
 </ul>

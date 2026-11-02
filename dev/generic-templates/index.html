@@ -1199,13 +1199,12 @@ the flag was already in that state, and bump a sequence counter. A waiter can bl
 </span><span id="__span-0-15"><a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a><span class="kt">bool</span><span class="w"> </span><span class="nf">WaitUntilReady</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
 </span><span id="__span-0-16"><a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="w">    </span><span class="n">flags_in</span><span class="p">.</span><span class="n">ClearWaitEvent</span><span class="p">();</span><span class="w">                         </span><span class="c1">// forget changes already seen</span>
 </span><span id="__span-0-17"><a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a><span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">flags_in</span><span class="p">.</span><span class="n">IsSet</span><span class="p">(</span><span class="n">SystemFlag</span><span class="o">::</span><span class="n">kReady</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">flags_in</span><span class="p">.</span><span class="n">WaitForChange</span><span class="p">(</span><span class="cm">/*timeout_ms=*/</span><span class="mi">100</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-0-18"><a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">flags_in</span><span class="p">.</span><span class="n">WaitForChange</span><span class="p">(</span><span class="cm">/*timeout_ms=*/</span><span class="mi">100</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w">  </span><span class="c1">// consumes the change signal</span>
 </span><span id="__span-0-19"><a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a><span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="nb">false</span><span class="p">;</span><span class="w">                              </span><span class="c1">// nothing changed in time</span>
 </span><span id="__span-0-20"><a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a><span class="w">        </span><span class="p">}</span>
-</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="w">        </span><span class="n">flags_in</span><span class="p">.</span><span class="n">ClearWaitEvent</span><span class="p">();</span><span class="w">                     </span><span class="c1">// re-arm before checking again</span>
-</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="w">    </span><span class="p">}</span>
-</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
-</span><span id="__span-0-24"><a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a><span class="p">}</span>
+</span><span id="__span-0-21"><a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a><span class="w">    </span><span class="p">}</span>
+</span><span id="__span-0-22"><a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nb">true</span><span class="p">;</span>
+</span><span id="__span-0-23"><a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a><span class="p">}</span>
 </span></code></pre></div>
 <table>
 <thead>
@@ -1248,12 +1247,9 @@ the flag was already in that state, and bump a sequence counter. A waiter can bl
 </tr>
 </tbody>
 </table>
-<div class="admonition note">
-<p class="admonition-title">Re-arm the waiter</p>
-<p>On the FreeRTOS backend the change signal stays set after <code>WaitForChange()</code> returns, so call
-<code>ClearWaitEvent()</code> before waiting again, as the example does. The timeout is passed to the kernel in ticks
-without conversion; it is milliseconds at the 1 kHz tick HardFOC ESP32 builds use.</p>
-</div>
+<p><code>WaitForChange()</code> consumes the change signal when it returns true, so the next call waits for a new change.
+Call <code>ClearWaitEvent()</code> to forget changes made before you start waiting, as the example does at the top. The
+timeout is milliseconds, converted to kernel ticks like every other timeout in the library.</p>
 <p>The event group behind the waiter is created on the first <code>WaitForChange()</code> or <code>ClearWaitEvent()</code>.</p>
 <h2 id="seqlocksnapshot">SeqlockSnapshot<a class="headerlink" href="#seqlocksnapshot" title="Permanent link">&para;</a></h2>
 <p>The latest value of a struct, published by one task and read by any number, without locks. The writer makes the

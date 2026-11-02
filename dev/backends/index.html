@@ -719,6 +719,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#event-flag-waits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Event-flag waits
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#capabilities-that-always-exist" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -978,6 +989,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#event-flag-waits" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Event-flag waits
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#capabilities-that-always-exist" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1093,28 +1115,28 @@ the build with an error when more than one is defined.</p>
 <tbody>
 <tr>
 <td><code>HF_RTOS_FREERTOS=1</code></td>
-<td><a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/09a2c0470d58df5561c396ffe207619f9fe3f23d/include/os/os_freertos.h"><code>os/os_freertos.h</code></a></td>
+<td><a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/6d59b84fc34ff391a346b6cde3a30df2de3b5626/include/os/os_freertos.h"><code>os/os_freertos.h</code></a></td>
 <td><code>freertos/FreeRTOS.h</code> (ESP-IDF) or flat <code>FreeRTOS.h</code>, probed with <code>__has_include</code></td>
 <td>Pinned to a core on SMP, plain create otherwise</td>
 <td>Spinlock on SMP, interrupt masking otherwise</td>
 </tr>
 <tr>
 <td><code>HF_RTOS_THREADX=1</code></td>
-<td><a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/09a2c0470d58df5561c396ffe207619f9fe3f23d/include/os/os_threadx.h"><code>os/os_threadx.h</code></a></td>
+<td><a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/6d59b84fc34ff391a346b6cde3a30df2de3b5626/include/os/os_threadx.h"><code>os/os_threadx.h</code></a></td>
 <td><code>tx_api.h</code></td>
 <td>None (single core)</td>
 <td><code>tx_interrupt_control</code></td>
 </tr>
 <tr>
 <td><code>HF_RTOS_CMSIS=1</code></td>
-<td><a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/09a2c0470d58df5561c396ffe207619f9fe3f23d/include/os/os_cmsis.h"><code>os/os_cmsis.h</code></a></td>
+<td><a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/6d59b84fc34ff391a346b6cde3a30df2de3b5626/include/os/os_cmsis.h"><code>os/os_cmsis.h</code></a></td>
 <td><code>cmsis_os2.h</code></td>
 <td>None (affinity lives in <code>osThreadAttr_t</code>)</td>
 <td><code>osKernelLock</code></td>
 </tr>
 <tr>
 <td><code>HF_RTOS_NONE=1</code></td>
-<td><a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/09a2c0470d58df5561c396ffe207619f9fe3f23d/include/os/os_none.h"><code>os/os_none.h</code></a></td>
+<td><a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/6d59b84fc34ff391a346b6cde3a30df2de3b5626/include/os/os_none.h"><code>os/os_none.h</code></a></td>
 <td>None</td>
 <td>None</td>
 <td>No-op</td>
@@ -1123,11 +1145,18 @@ the build with an error when more than one is defined.</p>
 </table>
 <p>FreeRTOS is the backend in use today (ESP-IDF v5.5 on the ESP32-S3, FreeRTOS kernel 11.1).</p>
 <div class="admonition note">
-<p class="admonition-title">CMSIS-RTOS2 provides the C layer only</p>
-<p><code>OsUtility.h</code> declares the <code>os_*_ex</code> helpers that the C++ classes call for <code>HF_RTOS_FREERTOS</code> and
-<code>HF_RTOS_THREADX</code> (and stubs them for <code>HF_RTOS_NONE</code>). Under <code>HF_RTOS_CMSIS</code> the <code>OS_*</code> types and <code>os_*</code>
-functions of the backend are available; the classes are not yet.</p>
+<p class="admonition-title">CMSIS-RTOS2 tick rate</p>
+<p>CMSIS-RTOS2 reports its tick frequency only at run time, and the millisecond-to-tick conversion is
+<code>constexpr</code>, so the backend assumes 1 kHz. Define <code>HF_RTOS_CMSIS_TICK_RATE_HZ</code> to your kernel's tick rate if
+it differs. On FreeRTOS the conversion uses <code>configTICK_RATE_HZ</code>; on ThreadX it assumes 1 kHz.
+<code>BaseThread::ChangePriority()</code> and <code>GetStackHighWaterMark()</code> are not implemented for CMSIS-RTOS2 and return
+false and 0. CI compiles the CMSIS-RTOS2 build against a declaration-only <code>cmsis_os2.h</code>; it has not yet run on
+a CMSIS kernel.</p>
 </div>
+<h2 id="event-flag-waits">Event-flag waits<a class="headerlink" href="#event-flag-waits" title="Permanent link">&para;</a></h2>
+<p><code>os_event_group_get()</code> returns <code>OS_SUCCESS</code> only when the wait condition was met (<code>OS_AND</code>: all bits, <code>OS_OR</code>:
+any of them) and an error on a timeout; the bits seen are written out either way. No backend clears bits unless
+the option includes <code>OS_EVENT_CLEAR</code>, which clears the awaited bits when the wait succeeds.</p>
 <h2 id="capabilities-that-always-exist">Capabilities that always exist<a class="headerlink" href="#capabilities-that-always-exist" title="Permanent link">&para;</a></h2>
 <p><code>os_thread_create_pinned</code> and <code>os_get_current_core_id</code> are present in every backend. On a single-core kernel the
 first creates an unpinned thread and the second returns 0, so callers never need their own <code>#if</code>.</p>
@@ -1202,7 +1231,7 @@ not fit, extend its backend header. Build systems select a backend; they do not 
 <li>Add the selection branch and the table row to <code>include/OsAbstraction.h</code>.</li>
 <li>Declare the <code>os_*_ex</code> helpers for it in <code>include/OsUtility.h</code> if the C++ classes are to build.</li>
 <li>Add storage to <code>src/CriticalSection.cpp</code> if the backend declares <code>os_critical_mux</code>.</li>
-<li>Add the row to <a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/09a2c0470d58df5561c396ffe207619f9fe3f23d/include/os/README.md"><code>include/os/README.md</code></a> and to the table on this page.</li>
+<li>Add the row to <a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/6d59b84fc34ff391a346b6cde3a30df2de3b5626/include/os/README.md"><code>include/os/README.md</code></a> and to the table on this page.</li>
 </ol>
 </div>
 <p>The <a href="../architecture/">layer figure</a> reads the backend table from <code>OsAbstraction.h</code>, so step 2 updates it.</p>
