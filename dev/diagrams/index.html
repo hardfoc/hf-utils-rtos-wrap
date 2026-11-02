@@ -105,6 +105,47 @@
   <meta property="og:description" content="C++ wrappers for RTOS threads, mutexes, semaphores, queues, event flags and timers, with FreeRTOS, ThreadX, CMSIS-RTOS2 and no-RTOS backends.">
   <meta property="og:url" content="https://hardfoc.github.io/hf-utils-rtos-wrap/latest/diagrams/">
   <meta name="twitter:card" content="summary">
+  <script>
+(function () {
+  if (typeof mermaid != "undefined" && !(mermaid instanceof Element)) return;
+  var SRC = "https://unpkg.com/mermaid@11/dist/mermaid.min.js", config = {}, real, loading, waiting = [];
+  var stub = {
+    initialize: function (c) { config = c || {}; if (real) real.initialize(config); },
+    render: function (id, text) {
+      var el = null, pres = document.querySelectorAll("pre.mermaid:not([data-hf-mermaid])");
+      for (var i = 0; i < pres.length && !el; i++) if (pres[i].textContent === text) el = pres[i];
+      if (el) el.setAttribute("data-hf-mermaid", "");
+      return near(el).then(load).then(function (m) { return m.render(id, text); });
+    }
+  };
+  function load() {
+    return loading || (loading = new Promise(function (resolve, reject) {
+      var s = document.createElement("script");
+      s.src = SRC;
+      s.onload = function () {
+        real = window.mermaid;
+        window.mermaid = stub;
+        real.initialize(config);
+        resolve(real);
+      };
+      s.onerror = function () { loading = null; reject(new Error("Mermaid did not load")); };
+      document.head.appendChild(s);
+    }));
+  }
+  function near(el) {
+    if (real || !el || !("IntersectionObserver" in window)) return Promise.resolve();
+    return new Promise(function (resolve) {
+      var io = new IntersectionObserver(function (entries) {
+        if (entries.some(function (e) { return e.isIntersecting; })) { io.disconnect(); resolve(); }
+      }, { rootMargin: "100% 0px" });
+      io.observe(el);
+      waiting.push(function () { io.disconnect(); resolve(); });
+    });
+  }
+  window.addEventListener("beforeprint", function () { waiting.splice(0).forEach(function (go) { go(); }); });
+  window.mermaid = stub;
+})();
+</script>
 
   </head>
   
@@ -470,15 +511,19 @@
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+      
+    
+    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
+      
         
-          
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
-            
+  
+  
+  
+    <a href="../quickstart/" class="md-nav__link">
+      
   
   
   <span class="md-ellipsis">
@@ -492,78 +537,12 @@
   
   
 
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_2">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Get started
+      
+        <span class="md-nav__icon md-icon"></span>
+      
+    </a>
   
 
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../quickstart/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Quickstart
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../integration/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Integration
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
       
     </li>
   
@@ -591,15 +570,19 @@
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+      
+    
+    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
+      
         
-          
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
-            
+  
+  
+  
+    <a href="../architecture/" class="md-nav__link">
+      
   
   
   <span class="md-ellipsis">
@@ -613,78 +596,12 @@
   
   
 
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Concepts
+      
+        <span class="md-nav__icon md-icon"></span>
+      
+    </a>
   
 
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../architecture/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Architecture
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../backends/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Backends
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
       
     </li>
   
@@ -722,15 +639,19 @@
       
     
     
-    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+      
+    
+    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
+      
         
-          
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
-            
+  
+  
+  
+    <a href="../api-guide/" class="md-nav__link">
+      
   
   
   <span class="md-ellipsis">
@@ -744,218 +665,12 @@
   
   
 
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Guides
+      
+        <span class="md-nav__icon md-icon"></span>
+      
+    </a>
   
 
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../api-guide/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    API guide
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../base-thread/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    BaseThread
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../synchronization/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Synchronization
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../queues/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Queues
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../timers/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Timers
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../generic-templates/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Generic templates
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../utility/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Utility
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
       
     </li>
   
@@ -993,6 +708,8 @@
         
       
     
+    
+      
     
     <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
@@ -1200,20 +917,20 @@ not redrawn, when the code changes. CI runs <code>hardfoc-docs figures --check</
 committed figure no longer matches the code. Each figure below lists the files it is drawn from.</p>
 <h2 id="one-api-one-backend-per-scheduler">One API, one backend per scheduler<a class="headerlink" href="#one-api-one-backend-per-scheduler" title="Permanent link">&para;</a></h2>
 <figure class="hf-figure">
-<img src="rtos-layers.svg#only-light" alt="Layer diagram: your code uses the C++ wrapper classes, which call the C portability layer of OsAbstraction.h and OsUtility.h, which includes one backend header chosen at build time: FreeRTOS, ThreadX, CMSIS-RTOS2, or the no-RTOS backend for host tests." width="1200" loading="lazy"><img src="rtos-layers.dark.svg#only-dark" alt="Layer diagram: your code uses the C++ wrapper classes, which call the C portability layer of OsAbstraction.h and OsUtility.h, which includes one backend header chosen at build time: FreeRTOS, ThreadX, CMSIS-RTOS2, or the no-RTOS backend for host tests." width="1200" loading="lazy">
+<img src="rtos-layers.svg#only-light" alt="Layer diagram: your code uses the C++ wrapper classes, which call the C portability layer of OsAbstraction.h and OsUtility.h, which includes one backend header chosen at build time: FreeRTOS, ThreadX, CMSIS-RTOS2, or the no-RTOS backend for host tests." width="1200" height="864"><img src="rtos-layers.dark.svg#only-dark" alt="Layer diagram: your code uses the C++ wrapper classes, which call the C portability layer of OsAbstraction.h and OsUtility.h, which includes one backend header chosen at build time: FreeRTOS, ThreadX, CMSIS-RTOS2, or the no-RTOS backend for host tests." width="1200" height="864">
 <figcaption>One API, one backend per scheduler</figcaption>
 </figure>
 
 <details class="hf-figure-desc">
 <summary>Figure description and sources</summary>
 <p>From top to bottom. Your code uses the C++ classes (listed from include/<em>.h). Every class calls the C portability layer, the OS_</em> types and os_* functions of OsAbstraction.h and OsUtility.h, and nothing else. That layer includes exactly one backend header from include/os/, chosen by a compile definition (read from the table in OsAbstraction.h); with no definition the no-RTOS backend is used, for host tests and bare metal. The backend is the only code that names a kernel.</p>
-<p>Drawn from: <a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/af581021a3d1a5386371db711d15c48d7dcd9431/include/*.h"><code>include/*.h</code></a> <code>classes</code>; <a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/af581021a3d1a5386371db711d15c48d7dcd9431/include/OsAbstraction.h"><code>include/OsAbstraction.h</code></a> <code>backend table</code>; figure module <a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/af581021a3d1a5386371db711d15c48d7dcd9431/docs/diagrams/figures/rtos-layers.py"><code>docs/diagrams/figures/rtos-layers.py</code></a>.</p>
+<p>Drawn from: <a href="https://github.com/hardfoc/hf-utils-rtos-wrap/tree/09a2c0470d58df5561c396ffe207619f9fe3f23d/include"><code>include</code></a> <code>classes</code>; <a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/09a2c0470d58df5561c396ffe207619f9fe3f23d/include/OsAbstraction.h"><code>include/OsAbstraction.h</code></a> <code>backend table</code>; figure module <a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/09a2c0470d58df5561c396ffe207619f9fe3f23d/docs/diagrams/figures/rtos-layers.py"><code>docs/diagrams/figures/rtos-layers.py</code></a>.</p>
 </details>
-<p>Figure module: <a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/af581021a3d1a5386371db711d15c48d7dcd9431/docs/diagrams/figures/rtos-layers.py"><code>docs/diagrams/figures/rtos-layers.py</code></a></p>
+<p>Figure module: <a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/09a2c0470d58df5561c396ffe207619f9fe3f23d/docs/diagrams/figures/rtos-layers.py"><code>docs/diagrams/figures/rtos-layers.py</code></a></p>
 <p>Drawn from:</p>
 <ul>
-<li><code>classes</code> in <a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/af581021a3d1a5386371db711d15c48d7dcd9431/include/*.h"><code>include/*.h</code></a></li>
-<li><code>backend table</code> in <a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/af581021a3d1a5386371db711d15c48d7dcd9431/include/OsAbstraction.h"><code>include/OsAbstraction.h</code></a></li>
+<li><code>classes</code> in <a href="https://github.com/hardfoc/hf-utils-rtos-wrap/tree/09a2c0470d58df5561c396ffe207619f9fe3f23d/include"><code>include</code></a></li>
+<li><code>backend table</code> in <a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/09a2c0470d58df5561c396ffe207619f9fe3f23d/include/OsAbstraction.h"><code>include/OsAbstraction.h</code></a></li>
 </ul>
 
 
@@ -1331,7 +1048,7 @@ committed figure no longer matches the code. Each figure below lists the files i
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.indexes", "navigation.top", "navigation.footer", "navigation.tracking", "navigation.instant", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.action.edit", "content.tabs.link", "toc.follow"], "search": "../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "default": "latest", "provider": "mike"}}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.indexes", "navigation.prune", "navigation.top", "navigation.footer", "navigation.tracking", "navigation.instant", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate", "content.action.edit", "content.tabs.link", "toc.follow"], "search": "../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"alias": true, "default": "latest", "provider": "mike"}}</script>
     
     
       <script src="../assets/javascripts/bundle.c21346df.min.js"></script>
