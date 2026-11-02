@@ -22,8 +22,8 @@
 <rect x="32" y="671.4" width="4" height="122" rx="2" fill="#2DD4BF"/>
 <rect x="321" y="663.4" width="269" height="138" rx="12" fill="#0F2A28" stroke="#2DD4BF" stroke-width="1.4"/>
 <rect x="321" y="671.4" width="4" height="122" rx="2" fill="#2DD4BF"/>
-<rect x="610" y="663.4" width="269" height="114" rx="12" fill="#0F2A28" stroke="#2DD4BF" stroke-width="1.4"/>
-<rect x="610" y="671.4" width="4" height="98" rx="2" fill="#2DD4BF"/>
+<rect x="610" y="663.4" width="269" height="138" rx="12" fill="#0F2A28" stroke="#2DD4BF" stroke-width="1.4"/>
+<rect x="610" y="671.4" width="4" height="122" rx="2" fill="#2DD4BF"/>
 <rect x="899" y="663.4" width="269" height="138" rx="12" fill="#0F2A28" stroke="#2DD4BF" stroke-width="1.4"/>
 <rect x="899" y="671.4" width="4" height="122" rx="2" fill="#2DD4BF"/>
 <text x="56" y="184.4" font-size="20" font-weight="700" fill="#E8EDF3">Your code</text>

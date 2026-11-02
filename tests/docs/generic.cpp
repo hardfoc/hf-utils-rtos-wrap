@@ -18,10 +18,12 @@ hf::FlagsReader<SystemFlag, kSystemFlagCount>& flags_in = system_flags;
 void MarkReady() { flags_out.Set(SystemFlag::kReady, os_get_elapsed_time_msec()); }
 
 bool WaitUntilReady() {
+    flags_in.ClearWaitEvent();                         // forget changes already seen
     while (!flags_in.IsSet(SystemFlag::kReady)) {
         if (!flags_in.WaitForChange(/*timeout_ms=*/100)) {
-            return false;                              // nothing changed for 100 ms
+            return false;                              // nothing changed in time
         }
+        flags_in.ClearWaitEvent();                     // re-arm before checking again
     }
     return true;
 }

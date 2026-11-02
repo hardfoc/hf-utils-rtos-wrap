@@ -1,11 +1,23 @@
 ---
-# Site navigation (mkdocs-awesome-nav): the tabs and sidebar, in this order.
+# Site navigation (mkdocs-awesome-nav): the core-library page set (docs/DOCS-STYLE-GUIDE.md in hf-general-ci-tools).
 nav:
   - Home: index.md
-  - "BaseThread.md": BaseThread.md
-  - "GenericTemplates.md": GenericTemplates.md
-  - "Queues.md": Queues.md
-  - "RTOSAbstraction.md": RTOSAbstraction.md
-  - "Synchronization.md": Synchronization.md
-  - "Timers.md": Timers.md
-  - "Utility.md": Utility.md
+  - Get started:
+      - Quickstart: quickstart.md
+      - Integration: integration.md
+  - Concepts:
+      - Architecture: architecture.md
+      - Backends: backends.md
+  - Guides:
+      - API guide: api-guide.md
+      - BaseThread: base-thread.md
+      - Synchronization: synchronization.md
+      - Queues: queues.md
+      - Timers: timers.md
+      - Generic templates: generic-templates.md
+      - Utility: utility.md
+  - Reference:
+      - API reference: api-reference.md
+      - Testing and CI: testing.md
+      - Figures: diagrams/index.md
+      - Changelog: changelog.md

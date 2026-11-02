@@ -12,12 +12,12 @@ protected:
                                 /*preempt_threshold=*/5, /*timeSliceAllowed=*/0,
                                 OS_AUTO_START);
     }
-    bool Setup() noexcept override { on_ = false; return true; }  // every start
+    bool Setup() noexcept override { on_ = false; return true; }  // on a start
     uint32_t Step() noexcept override {               // the loop body
         on_ = !on_;                                    // toggle an LED here
         return 500;                                    // ms until the next Step()
     }
-    bool Cleanup() noexcept override { ClearSetupComplete(); return true; }
+    bool Cleanup() noexcept override { on_ = false; return true; }  // after a stop
     bool ResetVariables() noexcept override { on_ = false; return true; }
 
 private:

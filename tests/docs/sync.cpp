@@ -64,11 +64,13 @@ void AdcFinished() { sensors.Set(kAdcDone); }
 void EncoderFinished() { sensors.Set(kEncoderDone); }
 
 bool WaitForBoth() {
+    constexpr uint32_t kBoth = kAdcDone | kEncoderDone;
     uint32_t bits = 0;
-    if (!sensors.Wait(kAdcDone | kEncoderDone, WaitMode::All, /*timeout_ms=*/5, bits)) {
-        return false;                                  // bits holds what did arrive
+    const bool ok = sensors.Wait(kBoth, WaitMode::All, /*timeout_ms=*/5, bits);
+    if (!ok || (bits & kBoth) != kBoth) {              // check the bits, not only the result
+        return false;
     }
-    sensors.Clear(kAdcDone | kEncoderDone);
+    sensors.Clear(kBoth);
     return true;
 }
 // --8<-- [end:event-flags]

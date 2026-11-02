@@ -70,7 +70,7 @@ def build(d):
     cards = []
     for i, b in enumerate(d["backends"]):
         cards.append(f.card(i * (bw + gap), y, bw, b["header"], [b["macro"], KERNEL.get(b["header"], "")],
-                            tone="teal", accent=True))
+                            tone="teal", accent=True, h=138))
     for cb in cards:
         f.connect(c, cb, "bottom", "top", bt=0.5, tone="rail")
     f.connect(app, reg, "bottom", "top", tone="rail")

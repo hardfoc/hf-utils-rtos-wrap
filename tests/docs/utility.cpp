@@ -22,3 +22,25 @@ uint64_t MeasureUs() {
     return RtosTime::GetCurrentTimeUs() - t0;
 }
 // --8<-- [end:time]
+
+// --8<-- [start:manager]
+#include <map>
+#include "BaseThread.h"
+#include "BaseThreadsManager.h"
+
+enum AppThread : int { kControl, kTelemetry, kAppThreadCount };  // unscoped: also the bitset size
+
+static const char* AppThreadName(AppThread t) {
+    return t == kControl ? "control" : "telemetry";
+}
+
+class AppThreads : public BaseThreadsManager<AppThread, kAppThreadCount> {
+public:
+    using BaseThreadsManager::BaseThreadsManager;
+};
+
+bool StartApp(BaseThread& control, BaseThread& telemetry) {
+    static AppThreads threads({{kControl, &control}, {kTelemetry, &telemetry}}, AppThreadName);
+    return threads.EnsureInitialized() && threads.StartAllAndWaitToVerify(/*waitToVerifyTimeoutMsec=*/1000);
+}
+// --8<-- [end:manager]
