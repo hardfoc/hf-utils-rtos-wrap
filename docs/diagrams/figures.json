@@ -1,0 +1,14 @@
+{
+  "rtos-layers": {
+    "title": "One API, one backend per scheduler",
+    "alt": "Layer diagram: your code uses the C++ wrapper classes, which call the C portability layer of OsAbstraction.h and OsUtility.h, which includes one backend header chosen at build time: FreeRTOS, ThreadX, CMSIS-RTOS2, or the no-RTOS backend for host tests.",
+    "description": "From top to bottom. Your code uses the C++ classes (listed from include/*.h). Every class calls the C portability layer, the OS_* types and os_* functions of OsAbstraction.h and OsUtility.h, and nothing else. That layer includes exactly one backend header from include/os/, chosen by a compile definition (read from the table in OsAbstraction.h); with no definition the no-RTOS backend is used, for host tests and bare metal. The backend is the only code that names a kernel.",
+    "profile": "overview",
+    "width": 1200,
+    "source": "docs/diagrams/figures/rtos-layers.py",
+    "sources": [
+      "include/*.h:classes",
+      "include/OsAbstraction.h:backend table"
+    ]
+  }
+}

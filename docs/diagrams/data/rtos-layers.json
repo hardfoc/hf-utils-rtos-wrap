@@ -1,0 +1,49 @@
+{
+  "classes": [
+    "BaseThread",
+    "BaseThreadsManager",
+    "CriticalGuard",
+    "ErrorHistoryReader",
+    "ErrorHistoryWriter",
+    "ErrorHistory",
+    "FlagsReader",
+    "FlagsWriter",
+    "FlagsSaver",
+    "Mutex",
+    "MutexGuard",
+    "OsEventFlags",
+    "OsQueue",
+    "PeriodicTimer",
+    "RtosTime",
+    "RtosMutex",
+    "RtosSharedMutex",
+    "RtosUniqueLock",
+    "RtosSharedLock",
+    "SnapshotReader",
+    "SnapshotWriter",
+    "SeqlockSnapshot",
+    "SignalSemaphore"
+  ],
+  "backends": [
+    {
+      "macro": "HF_RTOS_CMSIS",
+      "header": "os_cmsis.h"
+    },
+    {
+      "macro": "HF_RTOS_FREERTOS",
+      "header": "os_freertos.h"
+    },
+    {
+      "macro": "HF_RTOS_THREADX",
+      "header": "os_threadx.h"
+    },
+    {
+      "macro": "no definition",
+      "header": "os_none.h"
+    }
+  ],
+  "sources": [
+    "include/*.h:classes",
+    "include/OsAbstraction.h:backend table"
+  ]
+}
