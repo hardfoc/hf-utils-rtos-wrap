@@ -8,6 +8,7 @@
 #include <cstring>
 
 #include "FlagsSaver.h"
+#include "OsUtility.h"
 #include "OsEventFlags.h"
 #include "OsQueue.h"
 #include "SeqlockSnapshot.h"
@@ -151,6 +152,45 @@ void SeqlockWaitConsumesTheChange() {
     CHECK(shim::State().last_event_wait == portMAX_DELAY);
 }
 
+// The shim ticks at 100 Hz, so one tick is 10 ms.
+static_assert(os_convert_msec_to_delay_ticks(0) == 0, "0 ms is no wait");
+static_assert(os_convert_msec_to_delay_ticks(1) == 1, "a non-zero ms is at least one tick");
+static_assert(os_convert_msec_to_delay_ticks(9) == 1, "a non-zero ms is at least one tick");
+static_assert(os_convert_msec_to_delay_ticks(10) == 1, "exact multiple");
+static_assert(os_convert_msec_to_delay_ticks(25) == 2, "longer delays still round down");
+static_assert(os_convert_msec_to_delay_ticks(UINT32_MAX) == 429496729U, "64-bit product");
+static_assert(os_convert_hz_to_delay_ticks(0) == 0, "0 Hz has no period");
+static_assert(os_convert_hz_to_delay_ticks(1000) == 1, "faster than the tick is one tick");
+static_assert(os_convert_hz_to_delay_ticks(50) == 2, "50 Hz at 100 Hz");
+
+void ShortDelaysSleepAtLeastOneTick() {
+    shim::Reset();
+    os_delay_msec(1);
+    CHECK(shim::State().delay_calls == 1);
+    CHECK(shim::State().last_delay == 1);  // not 0: 1 ms at 100 Hz still waits a tick
+    os_delay_msec(5);
+    CHECK(shim::State().last_delay == 1);
+    os_delay_msec(30);
+    CHECK(shim::State().last_delay == 3);
+    os_delay_msec(0);
+    CHECK(shim::State().last_delay == 0);  // 0 ms stays a yield
+}
+
+void ShortTimeoutsWaitAtLeastOneTick() {
+    shim::Reset();
+    OsQueue<uint32_t, 1> q("short");
+    uint32_t v = 0;
+    CHECK(!q.Receive(v, 1));
+    CHECK(shim::State().last_queue_wait == 1);
+    CHECK(!q.Receive(v, 0));
+    CHECK(shim::State().last_queue_wait == 0);  // a poll stays a poll
+
+    OsEventFlags<> ev("short");
+    uint32_t seen = 0;
+    CHECK(!ev.Wait(0x1, WaitMode::Any, 3, seen));
+    CHECK(shim::State().last_event_wait == 1);
+}
+
 }  // namespace
 
 int main() {
@@ -167,6 +207,8 @@ int main() {
         {"EventWaitDoesNotClearBits", EventWaitDoesNotClearBits},
         {"FlagsSaverWaitConsumesTheChange", FlagsSaverWaitConsumesTheChange},
         {"SeqlockWaitConsumesTheChange", SeqlockWaitConsumesTheChange},
+        {"ShortDelaysSleepAtLeastOneTick", ShortDelaysSleepAtLeastOneTick},
+        {"ShortTimeoutsWaitAtLeastOneTick", ShortTimeoutsWaitAtLeastOneTick},
     };
     for (const Case& c : cases) {
         const int before = g_failures;

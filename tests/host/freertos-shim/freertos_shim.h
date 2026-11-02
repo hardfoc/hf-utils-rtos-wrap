@@ -25,6 +25,8 @@ struct Record {
     TickType_t last_event_wait{0};
     BaseType_t last_event_clear{pdFALSE};
     BaseType_t last_event_all{pdFALSE};
+    int delay_calls{0};
+    TickType_t last_delay{0};  ///< ticks passed to the last vTaskDelay()
 };
 
 Record& State();
