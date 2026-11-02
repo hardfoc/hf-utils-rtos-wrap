@@ -43,7 +43,7 @@
     }
   ],
   "sources": [
-    "include/*.h:classes",
+    "include:classes",
     "include/OsAbstraction.h:backend table"
   ]
 }
