@@ -38,6 +38,7 @@
 #include <type_traits>
 
 #include "OsAbstraction.h"
+#include "OsUtility.h"
 
 namespace hf {
 
@@ -144,9 +145,11 @@ public:
         OS_Ulong actual = 0;
         const OS_Ulong wait = (timeout_ms == UINT32_MAX)
                                   ? static_cast<OS_Ulong>(OS_WAIT_FOREVER)
-                                  : static_cast<OS_Ulong>(timeout_ms);
+                                  : static_cast<OS_Ulong>(os_convert_msec_to_delay_ticks(timeout_ms));
+        // Consume the signal: the next WaitForChange() waits for a new change.
         const OS_Uint rc = os_event_group_get(&event_group_, kEventBit_,
-                                              static_cast<OS_Uint>(OS_OR),
+                                              static_cast<OS_Uint>(OS_OR) |
+                                                  static_cast<OS_Uint>(OS_EVENT_CLEAR),
                                               &actual, wait);
         return (rc == OS_SUCCESS) && ((actual & kEventBit_) != 0U);
     }
