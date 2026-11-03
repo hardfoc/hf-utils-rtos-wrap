@@ -11,6 +11,7 @@ how hf-core does it.
 | Kernel | FreeRTOS 11.1 (ESP-IDF v5.5), ThreadX, or none; see [Backends](backends.md) |
 | Heap | Only where a kernel object is created, and `BaseThreadsManager`'s `std::map` |
 | Dependencies | None outside the kernel; this library includes nothing from other HardFOC repositories |
+| Tick rate | 1 kHz or faster for millisecond-precision delays and timeouts; see [Tick rate](#tick-rate) |
 
 The repository has no build files of its own: the integrating project lists the sources.
 
@@ -19,6 +20,19 @@ The repository has no build files of its own: the integrating project lists the 
 Most projects get this library through [hf-core](https://github.com/hardfoc/hf-core), which carries it in the
 `hf-core-utils` submodule and compiles the right sources for its `HF_CORE_RTOS` setting (`FREERTOS`, `THREADX` or
 `NONE`) in `cmake/hf_core_build_settings.cmake`. Nothing else is needed.
+
+## Tick rate
+
+HardFOC firmware runs FreeRTOS at **1 kHz or faster** (`CONFIG_FREERTOS_HZ=1000` in every HardFOC ESP-IDF
+`sdkconfig`). Millisecond delays and timeouts are only millisecond-precise at that rate or above: one tick is then
+1 ms or less, and `os_convert_msec_to_delay_ticks()` gives exactly `ms` ticks at 1 kHz.
+
+On a slower tick the wrapper does not fail, it rounds. A non-zero millisecond value becomes at least one tick and
+otherwise rounds down; 0 ms stays 0 ticks, a poll or a yield. At 100 Hz, `os_delay_msec(1)` and a 5 ms queue
+timeout both wait one tick (10 ms), and 25 ms waits 2 ticks (20 ms). Code written for HardFOC can assume the
+1 kHz rate; a project that runs slower gets these coarser waits.
+
+The CMSIS-RTOS2 and ThreadX backends assume 1 kHz for the conversion; see [Backends](backends.md).
 
 ## In your own CMake project
 

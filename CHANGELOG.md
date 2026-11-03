@@ -5,6 +5,8 @@ reached `main`.
 
 ## Unreleased
 
+- Integration docs state the HardFOC timing assumption: FreeRTOS at 1 kHz or faster for millisecond-precise
+  delays and timeouts, and rounding to at least one tick for a non-zero value otherwise.
 - `os_convert_msec_to_delay_ticks()` returns at least one tick for a non-zero millisecond value (it still rounds
   down otherwise, and 0 ms is still 0 ticks), on every backend. So `os_delay_msec()` and every timeout that goes
   through it (`OsQueue`, `OsEventFlags`, `FlagsSaver`, `SeqlockSnapshot`, `Mutex`, `MutexGuard`, `PeriodicTimer`)
