@@ -1115,28 +1115,28 @@ the build with an error when more than one is defined.</p>
 <tbody>
 <tr>
 <td><code>HF_RTOS_FREERTOS=1</code></td>
-<td><a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/93592fc4827bc38cbe2906da788d50d4be6e1a7a/include/os/os_freertos.h"><code>os/os_freertos.h</code></a></td>
+<td><a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/87ba18c2f4df797a1e752b06bd91cbbc810ab904/include/os/os_freertos.h"><code>os/os_freertos.h</code></a></td>
 <td><code>freertos/FreeRTOS.h</code> (ESP-IDF) or flat <code>FreeRTOS.h</code>, probed with <code>__has_include</code></td>
 <td>Pinned to a core on SMP, plain create otherwise</td>
 <td>Spinlock on SMP, interrupt masking otherwise</td>
 </tr>
 <tr>
 <td><code>HF_RTOS_THREADX=1</code></td>
-<td><a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/93592fc4827bc38cbe2906da788d50d4be6e1a7a/include/os/os_threadx.h"><code>os/os_threadx.h</code></a></td>
+<td><a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/87ba18c2f4df797a1e752b06bd91cbbc810ab904/include/os/os_threadx.h"><code>os/os_threadx.h</code></a></td>
 <td><code>tx_api.h</code></td>
 <td>None (single core)</td>
 <td><code>tx_interrupt_control</code></td>
 </tr>
 <tr>
 <td><code>HF_RTOS_CMSIS=1</code></td>
-<td><a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/93592fc4827bc38cbe2906da788d50d4be6e1a7a/include/os/os_cmsis.h"><code>os/os_cmsis.h</code></a></td>
+<td><a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/87ba18c2f4df797a1e752b06bd91cbbc810ab904/include/os/os_cmsis.h"><code>os/os_cmsis.h</code></a></td>
 <td><code>cmsis_os2.h</code></td>
 <td>None (affinity lives in <code>osThreadAttr_t</code>)</td>
 <td><code>osKernelLock</code></td>
 </tr>
 <tr>
 <td><code>HF_RTOS_NONE=1</code></td>
-<td><a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/93592fc4827bc38cbe2906da788d50d4be6e1a7a/include/os/os_none.h"><code>os/os_none.h</code></a></td>
+<td><a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/87ba18c2f4df797a1e752b06bd91cbbc810ab904/include/os/os_none.h"><code>os/os_none.h</code></a></td>
 <td>None</td>
 <td>None</td>
 <td>No-op</td>
@@ -1231,7 +1231,7 @@ not fit, extend its backend header. Build systems select a backend; they do not 
 <li>Add the selection branch and the table row to <code>include/OsAbstraction.h</code>.</li>
 <li>Declare the <code>os_*_ex</code> helpers for it in <code>include/OsUtility.h</code> if the C++ classes are to build.</li>
 <li>Add storage to <code>src/CriticalSection.cpp</code> if the backend declares <code>os_critical_mux</code>.</li>
-<li>Add the row to <a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/93592fc4827bc38cbe2906da788d50d4be6e1a7a/include/os/README.md"><code>include/os/README.md</code></a> and to the table on this page.</li>
+<li>Add the row to <a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/87ba18c2f4df797a1e752b06bd91cbbc810ab904/include/os/README.md"><code>include/os/README.md</code></a> and to the table on this page.</li>
 </ol>
 </div>
 <p>The <a href="../architecture/">layer figure</a> reads the backend table from <code>OsAbstraction.h</code>, so step 2 updates it.</p>

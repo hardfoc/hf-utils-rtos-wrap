@@ -671,6 +671,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#tick-rate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tick rate
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#in-your-own-cmake-project" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -950,6 +961,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#tick-rate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Tick rate
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#in-your-own-cmake-project" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1024,6 +1046,10 @@ how hf-core does it.</p>
 <td>Dependencies</td>
 <td>None outside the kernel; this library includes nothing from other HardFOC repositories</td>
 </tr>
+<tr>
+<td>Tick rate</td>
+<td>1 kHz or faster for millisecond-precision delays and timeouts; see <a href="#tick-rate">Tick rate</a></td>
+</tr>
 </tbody>
 </table>
 <p>The repository has no build files of its own: the integrating project lists the sources.</p>
@@ -1031,6 +1057,15 @@ how hf-core does it.</p>
 <p>Most projects get this library through <a href="https://github.com/hardfoc/hf-core">hf-core</a>, which carries it in the
 <code>hf-core-utils</code> submodule and compiles the right sources for its <code>HF_CORE_RTOS</code> setting (<code>FREERTOS</code>, <code>THREADX</code> or
 <code>NONE</code>) in <code>cmake/hf_core_build_settings.cmake</code>. Nothing else is needed.</p>
+<h2 id="tick-rate">Tick rate<a class="headerlink" href="#tick-rate" title="Permanent link">&para;</a></h2>
+<p>HardFOC firmware runs FreeRTOS at <strong>1 kHz or faster</strong> (<code>CONFIG_FREERTOS_HZ=1000</code> in every HardFOC ESP-IDF
+<code>sdkconfig</code>). Millisecond delays and timeouts are only millisecond-precise at that rate or above: one tick is then
+1 ms or less, and <code>os_convert_msec_to_delay_ticks()</code> gives exactly <code>ms</code> ticks at 1 kHz.</p>
+<p>On a slower tick the wrapper does not fail, it rounds. A non-zero millisecond value becomes at least one tick and
+otherwise rounds down; 0 ms stays 0 ticks, a poll or a yield. At 100 Hz, <code>os_delay_msec(1)</code> and a 5 ms queue
+timeout both wait one tick (10 ms), and 25 ms waits 2 ticks (20 ms). Code written for HardFOC can assume the
+1 kHz rate; a project that runs slower gets these coarser waits.</p>
+<p>The CMSIS-RTOS2 and ThreadX backends assume 1 kHz for the conversion; see <a href="../backends/">Backends</a>.</p>
 <h2 id="in-your-own-cmake-project">In your own CMake project<a class="headerlink" href="#in-your-own-cmake-project" title="Permanent link">&para;</a></h2>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git<span class="w"> </span>submodule<span class="w"> </span>add<span class="w"> </span>https://github.com/hardfoc/hf-utils-rtos-wrap.git<span class="w"> </span>external/hf-utils-rtos-wrap
 </span></code></pre></div>

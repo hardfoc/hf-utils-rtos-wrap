@@ -1081,6 +1081,8 @@
 reached <code>main</code>.</p>
 <h2 id="unreleased">Unreleased<a class="headerlink" href="#unreleased" title="Permanent link">&para;</a></h2>
 <ul>
+<li>Integration docs state the HardFOC timing assumption: FreeRTOS at 1 kHz or faster for millisecond-precise
+  delays and timeouts, and rounding to at least one tick for a non-zero value otherwise.</li>
 <li><code>os_convert_msec_to_delay_ticks()</code> returns at least one tick for a non-zero millisecond value (it still rounds
   down otherwise, and 0 ms is still 0 ticks), on every backend. So <code>os_delay_msec()</code> and every timeout that goes
   through it (<code>OsQueue</code>, <code>OsEventFlags</code>, <code>FlagsSaver</code>, <code>SeqlockSnapshot</code>, <code>Mutex</code>, <code>MutexGuard</code>, <code>PeriodicTimer</code>)
