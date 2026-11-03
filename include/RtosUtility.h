@@ -1,7 +1,11 @@
 #pragma once
 /**
- * @file Utility.h
+ * @file RtosUtility.h
  * @brief Miscellaneous utility helpers for the RTOS wrapper.
+ *
+ * Named RtosUtility.h (it was Utility.h) so it cannot be confused with
+ * hf-utils-general's Utility.h, which comes first on hf-core's include path
+ * and also defines the MIN / MAX macros.
  */
 
 #include <stdint.h>

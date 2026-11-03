@@ -1,7 +1,7 @@
 // Code shown on docs/utility.md. Compiled by tools/docs/check-snippets.sh.
 // --8<-- [start:wait]
 #include <atomic>
-#include "Utility.h"
+#include "RtosUtility.h"
 
 static std::atomic<bool> link_up{false};
 

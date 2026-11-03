@@ -10,7 +10,7 @@
 
 #include "BaseThread.h"
 #include "OsUtility.h"
-#include "Utility.h"
+#include "RtosUtility.h"
 
 //==============================================================//
 /// BASE THREAD ITEMS BASE NAMES
