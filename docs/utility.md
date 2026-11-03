@@ -5,6 +5,10 @@ turn FreeRTOS codes into text.
 
 ## TestLogicWithTimeout
 
+Declared in `RtosUtility.h`. The header was called `Utility.h`; it was renamed because hf-utils-general ships a
+`Utility.h` too (with `MIN` / `MAX` macros), and with hf-core's include order a `#include "Utility.h"` could reach
+that one instead.
+
 `TestLogicWithTimeout(func, expected, timeoutMsec, checkIntervalMs)` calls `func()` until it returns `expected`
 or `timeoutMsec` passes, sleeping `checkIntervalMs` between calls. It returns true when the value arrived.
 `BaseThread` uses it to verify starts and stops.

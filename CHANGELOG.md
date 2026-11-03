@@ -5,6 +5,15 @@ reached `main`.
 
 ## Unreleased
 
+### Breaking
+
+- `include/Utility.h` is renamed `include/RtosUtility.h` (`TestLogicWithTimeout()`), and `BaseThreadsManager.h`
+  and `BaseThread.cpp` include it by the new name. hf-utils-general also ships a `Utility.h` (with `MIN` / `MAX`
+  macros) and comes first on hf-core's include path, so a `#include "Utility.h"` not resolved next to the
+  including file, as in `src/BaseThread.cpp`, reached that header instead. There is no `Utility.h` shim: it would
+  keep the clash. Code that included this library's `Utility.h` must include `RtosUtility.h`. `tests/host/run.sh`
+  now compiles every source and header with a stand-in `Utility.h` first on the include path.
+
 - Integration docs state the HardFOC timing assumption: FreeRTOS at 1 kHz or faster for millisecond-precise
   delays and timeouts, and rounding to at least one tick for a non-zero value otherwise.
 - `os_convert_msec_to_delay_ticks()` returns at least one tick for a non-zero millisecond value (it still rounds
