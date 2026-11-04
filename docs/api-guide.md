@@ -17,7 +17,7 @@ notes.
 | Share status flags | `hf::FlagsSaver<Id, N>` | `FlagsSaver.h` | [Generic templates](generic-templates.md#flagssaver) |
 | Share the latest value of a struct | `hf::SeqlockSnapshot<T>` | `SeqlockSnapshot.h` | [Generic templates](generic-templates.md#seqlocksnapshot) |
 | Keep the last N errors | `hf::ErrorHistory<R, N>` | `ErrorHistory.h` | [Generic templates](generic-templates.md#errorhistory) |
-| Wait until a condition holds, with a timeout | `TestLogicWithTimeout()` | `Utility.h` | [Utility](utility.md#testlogicwithtimeout) |
+| Wait until a condition holds, with a timeout | `TestLogicWithTimeout()` | `RtosUtility.h` | [Utility](utility.md#testlogicwithtimeout) |
 | Read time, sleep | `RtosTime::GetCurrentTimeUs()`, `os_delay_msec()` | `RtosMutex.h`, `OsUtility.h` | [Utility](utility.md#time) |
 
 ## Conventions

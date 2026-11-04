@@ -27,7 +27,7 @@
 #include "OsAbstraction.h"
 
 #include "OsUtility.h"
-#include "Utility.h"
+#include "RtosUtility.h"
 #include "BaseThread.h"
 #include "Mutex.h"
 #include "MutexGuard.h"
