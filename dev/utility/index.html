@@ -1140,11 +1140,14 @@
 <p>Small helpers: wait for a condition with a timeout, read time and sleep, start a group of threads together, and
 turn FreeRTOS codes into text.</p>
 <h2 id="testlogicwithtimeout">TestLogicWithTimeout<a class="headerlink" href="#testlogicwithtimeout" title="Permanent link">&para;</a></h2>
+<p>Declared in <code>RtosUtility.h</code>. The header was called <code>Utility.h</code>; it was renamed because hf-utils-general ships a
+<code>Utility.h</code> too (with <code>MIN</code> / <code>MAX</code> macros), and with hf-core's include order a <code>#include "Utility.h"</code> could reach
+that one instead.</p>
 <p><code>TestLogicWithTimeout(func, expected, timeoutMsec, checkIntervalMs)</code> calls <code>func()</code> until it returns <code>expected</code>
 or <code>timeoutMsec</code> passes, sleeping <code>checkIntervalMs</code> between calls. It returns true when the value arrived.
 <code>BaseThread</code> uses it to verify starts and stops.</p>
 <div class="language-cpp highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;atomic&gt;</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">"Utility.h"</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">"RtosUtility.h"</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="k">static</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">atomic</span><span class="o">&lt;</span><span class="kt">bool</span><span class="o">&gt;</span><span class="w"> </span><span class="n">link_up</span><span class="p">{</span><span class="nb">false</span><span class="p">};</span>
 </span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>

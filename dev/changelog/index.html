@@ -885,6 +885,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Unreleased">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#breaking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Breaking
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -993,6 +1010,23 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Unreleased">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#breaking" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Breaking
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
@@ -1080,9 +1114,20 @@
 <p>All notable changes to hf-utils-rtos-wrap. The library has no releases yet; changes are listed by the date they
 reached <code>main</code>.</p>
 <h2 id="unreleased">Unreleased<a class="headerlink" href="#unreleased" title="Permanent link">&para;</a></h2>
+<h3 id="breaking">Breaking<a class="headerlink" href="#breaking" title="Permanent link">&para;</a></h3>
 <ul>
-<li>Integration docs state the HardFOC timing assumption: FreeRTOS at 1 kHz or faster for millisecond-precise
-  delays and timeouts, and rounding to at least one tick for a non-zero value otherwise.</li>
+<li>
+<p><code>include/Utility.h</code> is renamed <code>include/RtosUtility.h</code> (<code>TestLogicWithTimeout()</code>), and <code>BaseThreadsManager.h</code>
+  and <code>BaseThread.cpp</code> include it by the new name. hf-utils-general also ships a <code>Utility.h</code> (with <code>MIN</code> / <code>MAX</code>
+  macros) and comes first on hf-core's include path, so a <code>#include "Utility.h"</code> not resolved next to the
+  including file, as in <code>src/BaseThread.cpp</code>, reached that header instead. There is no <code>Utility.h</code> shim: it would
+  keep the clash. Code that included this library's <code>Utility.h</code> must include <code>RtosUtility.h</code>. <code>tests/host/run.sh</code>
+  now compiles every source and header with a stand-in <code>Utility.h</code> first on the include path.</p>
+</li>
+<li>
+<p>Integration docs state the HardFOC timing assumption: FreeRTOS at 1 kHz or faster for millisecond-precise
+  delays and timeouts, and rounding to at least one tick for a non-zero value otherwise.</p>
+</li>
 <li><code>os_convert_msec_to_delay_ticks()</code> returns at least one tick for a non-zero millisecond value (it still rounds
   down otherwise, and 0 ms is still 0 ticks), on every backend. So <code>os_delay_msec()</code> and every timeout that goes
   through it (<code>OsQueue</code>, <code>OsEventFlags</code>, <code>FlagsSaver</code>, <code>SeqlockSnapshot</code>, <code>Mutex</code>, <code>MutexGuard</code>, <code>PeriodicTimer</code>)

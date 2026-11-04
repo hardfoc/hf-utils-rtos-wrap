@@ -1006,7 +1006,7 @@
 <details class="hf-figure-desc">
 <summary>Figure description and sources</summary>
 <p>From top to bottom. Your code uses the C++ classes (listed from include/<em>.h). Every class calls the C portability layer, the OS_</em> types and os_* functions of OsAbstraction.h and OsUtility.h, and nothing else. That layer includes exactly one backend header from include/os/, chosen by a compile definition (read from the table in OsAbstraction.h); with no definition the no-RTOS backend is used, for host tests and bare metal. The backend is the only code that names a kernel.</p>
-<p>Drawn from: <a href="https://github.com/hardfoc/hf-utils-rtos-wrap/tree/87ba18c2f4df797a1e752b06bd91cbbc810ab904/include"><code>include</code></a> <code>classes</code>; <a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/87ba18c2f4df797a1e752b06bd91cbbc810ab904/include/OsAbstraction.h"><code>include/OsAbstraction.h</code></a> <code>backend table</code>; figure module <a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/87ba18c2f4df797a1e752b06bd91cbbc810ab904/docs/diagrams/figures/rtos-layers.py"><code>docs/diagrams/figures/rtos-layers.py</code></a>.</p>
+<p>Drawn from: <a href="https://github.com/hardfoc/hf-utils-rtos-wrap/tree/3f5c4fe0eae1e291cd6cc25b262e7802229a6644/include"><code>include</code></a> <code>classes</code>; <a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/3f5c4fe0eae1e291cd6cc25b262e7802229a6644/include/OsAbstraction.h"><code>include/OsAbstraction.h</code></a> <code>backend table</code>; figure module <a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/3f5c4fe0eae1e291cd6cc25b262e7802229a6644/docs/diagrams/figures/rtos-layers.py"><code>docs/diagrams/figures/rtos-layers.py</code></a>.</p>
 </details>
 <h2 id="layers">Layers<a class="headerlink" href="#layers" title="Permanent link">&para;</a></h2>
 <table>
@@ -1020,17 +1020,17 @@
 <tbody>
 <tr>
 <td>C++ wrappers</td>
-<td><a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/87ba18c2f4df797a1e752b06bd91cbbc810ab904/include/BaseThread.h"><code>include/*.h</code></a>, <a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/87ba18c2f4df797a1e752b06bd91cbbc810ab904/src/BaseThread.cpp"><code>src/*.cpp</code></a></td>
+<td><a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/3f5c4fe0eae1e291cd6cc25b262e7802229a6644/include/BaseThread.h"><code>include/*.h</code></a>, <a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/3f5c4fe0eae1e291cd6cc25b262e7802229a6644/src/BaseThread.cpp"><code>src/*.cpp</code></a></td>
 <td><code>BaseThread</code>, <code>RtosMutex</code>, <code>Mutex</code>, <code>MutexGuard</code>, <code>SignalSemaphore</code>, <code>OsQueue</code>, <code>OsEventFlags</code>, <code>PeriodicTimer</code>, <code>CriticalGuard</code>, the generic templates, <code>TestLogicWithTimeout</code></td>
 </tr>
 <tr>
 <td>C portability layer</td>
-<td><a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/87ba18c2f4df797a1e752b06bd91cbbc810ab904/include/OsAbstraction.h"><code>include/OsAbstraction.h</code></a>, <a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/87ba18c2f4df797a1e752b06bd91cbbc810ab904/include/OsUtility.h"><code>include/OsUtility.h</code></a>, <a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/87ba18c2f4df797a1e752b06bd91cbbc810ab904/src/OsUtility.cpp"><code>src/OsUtility.cpp</code></a></td>
+<td><a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/3f5c4fe0eae1e291cd6cc25b262e7802229a6644/include/OsAbstraction.h"><code>include/OsAbstraction.h</code></a>, <a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/3f5c4fe0eae1e291cd6cc25b262e7802229a6644/include/OsUtility.h"><code>include/OsUtility.h</code></a>, <a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/3f5c4fe0eae1e291cd6cc25b262e7802229a6644/src/OsUtility.cpp"><code>src/OsUtility.cpp</code></a></td>
 <td>The <code>OS_*</code> types and <code>os_*</code> functions: threads, queues, mutexes, semaphores, event groups, timers, stream buffers, critical sections, time</td>
 </tr>
 <tr>
 <td>Backend</td>
-<td><a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/87ba18c2f4df797a1e752b06bd91cbbc810ab904/include/os/README.md"><code>include/os/</code></a></td>
+<td><a href="https://github.com/hardfoc/hf-utils-rtos-wrap/blob/3f5c4fe0eae1e291cd6cc25b262e7802229a6644/include/os/README.md"><code>include/os/</code></a></td>
 <td>One header per scheduler that maps the <code>OS_*</code> / <code>os_*</code> surface onto the kernel</td>
 </tr>
 </tbody>

@@ -2,66 +2,66 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://hardfoc.github.io/hf-utils-rtos-wrap/latest/</loc>
-         <lastmod>2026-11-03</lastmod>
+         <lastmod>2026-11-04</lastmod>
     </url>
     <url>
          <loc>https://hardfoc.github.io/hf-utils-rtos-wrap/latest/api-guide/</loc>
-         <lastmod>2026-11-03</lastmod>
+         <lastmod>2026-11-04</lastmod>
     </url>
     <url>
          <loc>https://hardfoc.github.io/hf-utils-rtos-wrap/latest/api-reference/</loc>
-         <lastmod>2026-11-03</lastmod>
+         <lastmod>2026-11-04</lastmod>
     </url>
     <url>
          <loc>https://hardfoc.github.io/hf-utils-rtos-wrap/latest/architecture/</loc>
-         <lastmod>2026-11-03</lastmod>
+         <lastmod>2026-11-04</lastmod>
     </url>
     <url>
          <loc>https://hardfoc.github.io/hf-utils-rtos-wrap/latest/backends/</loc>
-         <lastmod>2026-11-03</lastmod>
+         <lastmod>2026-11-04</lastmod>
     </url>
     <url>
          <loc>https://hardfoc.github.io/hf-utils-rtos-wrap/latest/base-thread/</loc>
-         <lastmod>2026-11-03</lastmod>
+         <lastmod>2026-11-04</lastmod>
     </url>
     <url>
          <loc>https://hardfoc.github.io/hf-utils-rtos-wrap/latest/changelog/</loc>
-         <lastmod>2026-11-03</lastmod>
+         <lastmod>2026-11-04</lastmod>
     </url>
     <url>
          <loc>https://hardfoc.github.io/hf-utils-rtos-wrap/latest/generic-templates/</loc>
-         <lastmod>2026-11-03</lastmod>
+         <lastmod>2026-11-04</lastmod>
     </url>
     <url>
          <loc>https://hardfoc.github.io/hf-utils-rtos-wrap/latest/integration/</loc>
-         <lastmod>2026-11-03</lastmod>
+         <lastmod>2026-11-04</lastmod>
     </url>
     <url>
          <loc>https://hardfoc.github.io/hf-utils-rtos-wrap/latest/queues/</loc>
-         <lastmod>2026-11-03</lastmod>
+         <lastmod>2026-11-04</lastmod>
     </url>
     <url>
          <loc>https://hardfoc.github.io/hf-utils-rtos-wrap/latest/quickstart/</loc>
-         <lastmod>2026-11-03</lastmod>
+         <lastmod>2026-11-04</lastmod>
     </url>
     <url>
          <loc>https://hardfoc.github.io/hf-utils-rtos-wrap/latest/synchronization/</loc>
-         <lastmod>2026-11-03</lastmod>
+         <lastmod>2026-11-04</lastmod>
     </url>
     <url>
          <loc>https://hardfoc.github.io/hf-utils-rtos-wrap/latest/testing/</loc>
-         <lastmod>2026-11-03</lastmod>
+         <lastmod>2026-11-04</lastmod>
     </url>
     <url>
          <loc>https://hardfoc.github.io/hf-utils-rtos-wrap/latest/timers/</loc>
-         <lastmod>2026-11-03</lastmod>
+         <lastmod>2026-11-04</lastmod>
     </url>
     <url>
          <loc>https://hardfoc.github.io/hf-utils-rtos-wrap/latest/utility/</loc>
-         <lastmod>2026-11-03</lastmod>
+         <lastmod>2026-11-04</lastmod>
     </url>
     <url>
          <loc>https://hardfoc.github.io/hf-utils-rtos-wrap/latest/diagrams/</loc>
-         <lastmod>2026-11-03</lastmod>
+         <lastmod>2026-11-04</lastmod>
     </url>
 </urlset>
